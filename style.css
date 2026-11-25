@@ -355,23 +355,38 @@ table.calc-mini tr.calc-total th,table.calc-mini tr.calc-total td{font-weight:70
 .calc-fold[open] > summary{margin-bottom:.6rem}
 .callout.calc-note:has(.calc-fold:not([open])){padding-top:.8rem;padding-bottom:.8rem}
 
-/* ---- Contested stories: one card per story ---- */
-.story-cards{display:grid;grid-template-columns:1fr;gap:1rem;margin:1.2rem 0 1.4rem}
-.story-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.15rem 1.05rem}
-.story-card header{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:.55rem}
-.story-card h3{margin:0;font-size:1.2rem}
-.story-card p{margin:.5rem 0 0;font-size:.97rem;line-height:1.55}
-.story-label{display:block;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.1rem}
-.story-known{font-size:1.02rem!important;color:#eef1f5}
-.story-crit{border-left:3px solid #8a93a3;padding-left:.7rem}
-.story-gn{font-size:.85rem!important;color:var(--muted);border-top:1px dashed var(--line);padding-top:.5rem}
-@media (min-width:900px){ .story-cards{grid-template-columns:1fr 1fr} }
+/* ---- Contested stories: one story per block, stacked, in the text column ---- */
+.story-cards{display:flex;flex-direction:column;gap:1.1rem;margin:1.3rem 0 1.5rem;max-width:var(--measure)}
+.story-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.05rem 1.25rem 1rem}
+.story-card h3{margin:0 0 .5rem;font-size:1.25rem}
+.story-card p{margin:.6rem 0 0;font-size:1rem;line-height:1.6}
+.story-label{display:block;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.12rem}
+.story-known{font-size:1.04rem!important;color:#eef1f5}
+.story-crit{border-left:3px solid #8a93a3;padding-left:.75rem}
+.story-status{margin-top:.8rem!important}
+.story-gn{font-size:.85rem!important;color:var(--muted);border-top:1px dashed var(--line);padding-top:.5rem;margin-top:.5rem!important}
 @media (min-width:1200px){
-  section>.story-cards{max-width:none;margin-right:calc(-1 * (var(--gutter) + var(--gap2)));clear:right}
-  /* Contested stories: quote stays in the text column, the two photos sit side by side, so no empty gap above the cards */
+  section>.story-cards{display:flex;clear:none}
+  /* Contested stories: quote stays in the text column, the two photos sit side by side */
   #contested-stories>.pullquote{float:none;width:auto;max-width:var(--measure);margin:1.2rem 0;display:flow-root}
   #contested-stories>.figs figure:nth-child(2):last-child{grid-column:auto}
   #contested-stories>.figs figure:first-child{grid-column:auto}
   #contested-stories>.figs figure img,#contested-stories>.figs figure:nth-child(2):last-child img{aspect-ratio:4/3}
   #contested-stories>.figs figure figcaption{font-size:.78rem;padding:.4rem .55rem .5rem;line-height:1.35}
+}
+/* Contested stories: one photo per story, beside the text on wide screens, above it on phones */
+.story-card.has-fig{display:flex;flex-direction:column;gap:.9rem}
+.story-card .story-fig{order:-1;margin:0;background:none;border:0}
+.story-card .story-fig img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:10px;display:block}
+.story-card .story-fig figcaption{font-size:.78rem;line-height:1.4;color:var(--muted);padding:.4rem 0 0}
+.story-card .story-fig .credit{display:block;font-size:.7rem}
+@media (min-width:900px){
+  .story-card.has-fig{display:grid;grid-template-columns:minmax(0,1fr) 15rem;gap:1.4rem;align-items:start}
+  .story-card .story-fig{order:0}
+  .story-card .story-fig img{aspect-ratio:4/3}
+}
+@media (min-width:1200px){
+  /* the card reaches into the side column so the text keeps the normal column width */
+  section>.story-cards{max-width:calc(var(--measure) + 16.4rem)}
+  .story-card .story-text{max-width:var(--measure)}
 }
