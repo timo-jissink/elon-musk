@@ -16,4 +16,10 @@
     id = id || current || (location.hash || '').slice(1);
     a.href = a.getAttribute('href').split('#')[0] + (id ? '#' + id : '');
   }));
+  // Open a folded block when a link points into it (e.g. the Starship card -> #starship-calc).
+  const openTarget = () => { const id = decodeURIComponent(location.hash.slice(1)); const el = id && document.getElementById(id); if (!el) return;
+    let d = el.closest('details'); if (!d) d = el.querySelector(':scope > details');
+    for (; d; d = d.parentElement && d.parentElement.closest('details')) d.open = true;
+    if (el.querySelector(':scope > details')) el.querySelector(':scope > details').open = true; };
+  addEventListener('hashchange', openTarget); openTarget();
 })();

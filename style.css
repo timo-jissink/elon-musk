@@ -345,3 +345,12 @@ table.calc-mini tr.calc-total th,table.calc-mini tr.calc-total td{font-weight:70
 .pullquote .translation{font-size:.82em;font-weight:400;color:var(--muted);margin-top:.4rem}
 .langswitch,.navmenu{flex-shrink:0}
 @media (max-width:600px){ .topbar-in{gap:.5rem;padding:.55rem .9rem} .brand{white-space:normal;min-width:0;flex:1;font-size:.92rem;line-height:1.25} .langswitch{font-size:.85rem;gap:.15rem} }
+/* Starship method box: folded by default */
+.calc-fold > summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;align-items:baseline;gap:.2rem .6rem}
+.calc-fold > summary::-webkit-details-marker{display:none}
+.calc-fold > summary::before{content:"▸";color:var(--accent2);font-weight:700;transition:transform .15s}
+.calc-fold[open] > summary::before{transform:rotate(90deg)}
+.calc-fold > summary .callout-lead{margin:0}
+.calc-fold > summary .fold-hint{color:var(--muted);font-size:.9rem}
+.calc-fold[open] > summary{margin-bottom:.6rem}
+.callout.calc-note:has(.calc-fold:not([open])){padding-top:.8rem;padding-bottom:.8rem}
