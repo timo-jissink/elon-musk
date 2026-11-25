@@ -390,3 +390,11 @@ table.calc-mini tr.calc-total th,table.calc-mini tr.calc-total td{font-weight:70
   section>.story-cards{max-width:calc(var(--measure) + 16.4rem)}
   .story-card .story-text{max-width:var(--measure)}
 }
+/* folded fact rows: one-line summary, details on click */
+.row-fold > summary{cursor:pointer;list-style:none}
+.row-fold > summary::-webkit-details-marker{display:none}
+.row-fold > summary::after{content:"  " attr(data-more) " ▸";color:var(--accent);font-size:.9em;white-space:nowrap}
+.row-fold[open] > summary{color:var(--muted)}
+.row-fold > p{margin:.5rem 0 0}
+.row-fold[open] > summary::after{content:none}
+.two-col > .callout:has(> .calc-fold:not([open])){align-self:start}
