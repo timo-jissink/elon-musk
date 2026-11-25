@@ -284,8 +284,41 @@ h3{scroll-margin-top:5rem}
 .callout.plain .callout-lead{color:var(--ok)}
 .callout.plain p{font-size:1.02rem}
 @media (min-width:1200px){
+  #summary>.figs{width:18rem}
+  section>.figs figure:nth-child(2):last-child{grid-column:1/-1}
+  section>.figs figure:nth-child(2):last-child img{aspect-ratio:21/9}
+}
+@media (max-width:640px){
+  /* phones: photos in one clean swipe row */
+  .figs:not(.single){display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:.7rem;padding-bottom:.4rem;-webkit-overflow-scrolling:touch}
+  .figs:not(.single) figure{flex:0 0 84%;scroll-snap-align:start}
+  .figs:not(.single) figure img,.figs:not(.single) figure:first-child img{aspect-ratio:4/3}
+}
+
+/* ---- Round 7 ---- */
+.row-sub{display:block;font-weight:400;font-size:.8rem;color:var(--muted);margin-top:.2rem;line-height:1.35}
+.cost-line{display:block;margin:.15rem 0}
+.cost-line .tag{margin-right:.4rem}
+tr.row-projection th,tr.row-projection td{background:rgba(255,184,107,.05)}
+.callout.calc-note{border-left-color:var(--accent2);background:linear-gradient(135deg,#221b13,#18150f);border-color:#4a3a26}
+.callout.calc-note .callout-lead{color:var(--accent2)}
+.callout.calc-note ul{margin:.4rem 0 .6rem;padding-left:1.2rem}
+.callout.calc-note li{margin:.35rem 0}
+.calc-sum{margin:.6rem 0 0}
+.calc-formula{font-size:.95rem;color:#d9dee6}
+table.calc-mini{width:100%;border-collapse:collapse;font-size:.92rem;margin:.5rem 0 .8rem}
+table.calc-mini th,table.calc-mini td{padding:.35rem .5rem;border-bottom:1px solid #2a3240;text-align:left}
+table.calc-mini tr.calc-total th,table.calc-mini tr.calc-total td{font-weight:700;color:#ffe2bf}
+@media (max-width:640px){table.calc-mini{display:table;font-size:.82rem}table.calc-mini thead{display:table-header-group;position:static}table.calc-mini tbody{display:table-row-group}table.calc-mini tr{display:table-row;background:none;border:0;border-radius:0;margin:0;padding:0}table.calc-mini th,table.calc-mini td{display:table-cell;padding:.3rem .35rem;font-size:.82rem;border-bottom:1px solid #2a3240}table.calc-mini td::before{content:none}.callout.calc-note{padding:1rem .9rem}.calc-sum{padding-left:.6rem;padding-right:.6rem}}
+@media (min-width:1200px){
+  section{container-type:inline-size;container-name:sec}
+}
+/* collage floats only where the full text column still fits beside it; text blocks then all keep the same width */
+@media (min-width:1200px){
+  section{--cw:clamp(17rem, calc(100cqw + var(--gutter) + var(--gap2) - var(--measure) - 1.6rem), 27rem)}
+  section.personal > *{max-width:var(--measure)}
   /* photos become an inset collage on the right: one large, the others smaller beside the text */
-  section>.figs,section>.figs.single{float:right;clear:right;width:26rem;max-width:none;margin:.4rem calc(-1 * (var(--gutter) + var(--gap2))) 1.4rem 1.8rem;display:grid;grid-template-columns:1fr 1fr;gap:.6rem;grid-auto-flow:row}
+  section>.figs,section>.figs.single{float:right;clear:right;width:var(--cw);max-width:none;margin:.4rem calc(-1 * (var(--gutter) + var(--gap2))) 1.4rem 1.8rem;display:grid;grid-template-columns:1fr 1fr;gap:.6rem;grid-auto-flow:row}
   section>.figs figure:first-child{grid-column:1/-1;grid-row:auto;display:block}
   section>.figs figure:first-child img{aspect-ratio:16/10;height:auto;flex:none;min-height:0}
   section>.figs.single figure:first-child img{aspect-ratio:4/3;height:auto}
@@ -298,13 +331,17 @@ h3{scroll-margin-top:5rem}
   section>.rows,section>.more{display:block;overflow:hidden}
   section.personal>.figs{float:none;width:auto;margin:1.4rem 0;display:block}
   section.personal>.figs figure:first-child img{aspect-ratio:16/9}
-  #summary>.figs{width:18rem}
   section>.figs figure:nth-child(2):last-child{grid-column:1/-1}
   section>.figs figure:nth-child(2):last-child img{aspect-ratio:21/9}
 }
-@media (max-width:640px){
-  /* phones: photos in one clean swipe row */
-  .figs:not(.single){display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:.7rem;padding-bottom:.4rem;-webkit-overflow-scrolling:touch}
-  .figs:not(.single) figure{flex:0 0 84%;scroll-snap-align:start}
-  .figs:not(.single) figure img,.figs:not(.single) figure:first-child img{aspect-ratio:4/3}
-}
+
+/* ---- Language switch (EN | NL) and quote translations ---- */
+.langswitch{margin-left:auto;display:flex;align-items:center;gap:.35rem;font-size:.9rem;font-weight:700;letter-spacing:.04em}
+.langswitch + .navmenu{margin-left:.4rem}
+.langswitch a{color:var(--muted);text-decoration:none;padding:.2rem .45rem;border-radius:6px}
+.langswitch a:hover,.langswitch a:focus-visible{color:var(--accent);background:#1b222c}
+.langswitch [aria-current]{color:var(--text);padding:.2rem .45rem;border-radius:6px;background:#1b222c}
+.langswitch .sep{color:#3a4350}
+.pullquote .translation{font-size:.82em;font-weight:400;color:var(--muted);margin-top:.4rem}
+.langswitch,.navmenu{flex-shrink:0}
+@media (max-width:600px){ .topbar-in{gap:.5rem;padding:.55rem .9rem} .brand{white-space:normal;min-width:0;flex:1;font-size:.92rem;line-height:1.25} .langswitch{font-size:.85rem;gap:.15rem} }
