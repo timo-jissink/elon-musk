@@ -6,7 +6,7 @@
 :root{
   --bg:#0b0d11; --bg2:#12151b; --card:#171b22; --line:#262c36;
   --text:#e7e9ee; --muted:#9aa3b2; --accent:#7cc4ff; --accent2:#ffb86b;
-  --ok:#5fd39a; --warn:#ffc65c; --bad:#ff7a7a;
+  --ok:#5fd39a; --warn:#ffc65c; --bad:#ff7a7a; --neutral:#aab3c2;
   --measure:66ch; --wide:1100px;
   --font:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
@@ -92,6 +92,7 @@ table.wide{min-width:900px}
 .tag-success{background:rgba(95,211,154,.14);color:var(--ok)}
 .tag-warning{background:rgba(255,198,92,.14);color:var(--warn)}
 .tag-danger{background:rgba(255,122,122,.14);color:var(--bad)}
+.tag-neutral{background:rgba(170,179,194,.14);color:#c9d0db}
 .dot{display:inline-block;width:.7em;height:.7em;border-radius:50%;margin-right:.4em;vertical-align:-.05em}
 
 /* sources */
@@ -219,3 +220,53 @@ h3{scroll-margin-top:5rem}
 .calc-src{font-size:.9rem;color:var(--muted);padding-left:1.4rem}
 .calc ul{padding-left:1.2rem;color:#cfd5de}
 .calc li{margin:.4rem 0}
+
+/* ---- Round 5: compact sources ---- */
+.sources{margin:1rem 0;background:none;border:0;border-top:1px dashed var(--line);border-radius:0;padding:0}
+.sources summary{font-size:.85rem;padding:.4rem 0;color:var(--muted);letter-spacing:.02em}
+.sources summary:hover{color:var(--text)}
+.sources ol,.source-list{font-size:.82rem;line-height:1.45;padding-left:1.6rem;margin:.2rem 0 .6rem;color:var(--muted)}
+.sources li,.source-list li{margin:.15rem 0}
+.src-site{color:#b9c0cc}
+.sources.master{border-top:0}
+.sources.master>summary{font-size:1rem;color:var(--accent);padding:.6rem 0}
+.source-list{columns:3 16rem;column-gap:2rem}
+.sources.master .table-wrap{font-size:.85rem}
+.credits-table td,.credits-table th{padding:.35rem .6rem;font-size:.85rem}
+
+/* ---- Round 5: wide screens: wider figures + right-margin side notes ---- */
+.readmore>summary{font-weight:700}
+.rm-count{font-weight:400;color:var(--muted)}
+@media (min-width:1200px){
+  :root{--wide:1480px; --gutter:17rem; --gap2:2.5rem}
+  .layout{grid-template-columns:13rem minmax(0,1fr);gap:2.5rem}
+  section{display:flow-root;padding-right:calc(var(--gutter) + var(--gap2));position:relative}
+  section>*{max-width:var(--measure)}
+  /* figures, charts, tables and two-column boxes break out into the margin */
+  section>.figs,section>.table-wrap,section>.chart-fig,section>figure,section>.two-col,section>.more>.table-wrap{max-width:none;margin-right:calc(-1 * (var(--gutter) + var(--gap2)));clear:right}
+  section>.figs{max-width:none}
+  /* side notes: per-section sources and pull quotes sit in the right margin */
+  section>details.sources:not(.master),section>.pullquote{float:right;clear:right;width:var(--gutter);margin:.3rem calc(-1 * (var(--gutter) + var(--gap2))) 1rem 0;max-width:none}
+  section>.pullquote{border-left:3px solid var(--accent2);padding:.2rem 0 .2rem 1rem}
+  section>.pullquote p{font-size:1.15rem}
+  section>details.sources:not(.master){border-top:1px dashed var(--line)}
+  section.personal{padding-right:calc(var(--gutter) + var(--gap2))}
+  #sources,#image-credits{padding-right:0}
+  #sources>*,#image-credits>*{max-width:none}
+}
+@media (min-width:1200px){
+  section>.rows,section>.more,section>.callout,section>.inshort,section>.keyfindings{max-width:var(--measure)}
+  section.personal>.figs,section.personal>figure{margin-right:0}
+}
+@media (min-width:1200px){
+  .figs{grid-template-columns:2fr 1fr;grid-auto-flow:dense}
+  .figs figure:first-child{grid-column:1;grid-row:span 2}
+  .figs figure:first-child img{aspect-ratio:auto;height:100%;min-height:100%}
+  .figs figure:first-child{display:flex;flex-direction:column}
+  .figs figure:first-child img{flex:1 1 auto;object-fit:cover;min-height:0;height:0}
+  .figs figure:not(:first-child) img{aspect-ratio:16/10}
+  .figs.single{grid-template-columns:1fr}
+  .figs.single figure:first-child{grid-row:auto}
+  .figs.single figure:first-child img{aspect-ratio:21/9;height:auto;flex:none}
+}
+.source-list{padding-left:2.4rem;column-gap:3.2rem}
