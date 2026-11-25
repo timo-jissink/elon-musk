@@ -270,3 +270,41 @@ h3{scroll-margin-top:5rem}
   .figs.single figure:first-child img{aspect-ratio:21/9;height:auto;flex:none}
 }
 .source-list{padding-left:2.4rem;column-gap:3.2rem}
+
+/* press quote (RP article) */
+.press-quote{margin:1.2rem 0;padding:.9rem 1.1rem;border-left:3px solid var(--accent);background:var(--card);border-radius:6px}
+.press-quote p{margin:0 0 .5rem}
+.press-quote .translation{color:var(--muted);font-size:.95em}
+.press-quote footer{font-size:.85rem;color:var(--muted)}
+
+/* ---- Round 6: impact first, plain-words boxes, photo collages ---- */
+.impact{font-size:1.14rem;line-height:1.7;color:#eef1f5;margin:.4rem 0 1.2rem;max-width:var(--measure)}
+.impact-lead{display:block;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:.8rem;margin-bottom:.2rem}
+.callout.plain{border-left-color:var(--ok);background:linear-gradient(135deg,#13221b,#121a16);border-color:#24453a}
+.callout.plain .callout-lead{color:var(--ok)}
+.callout.plain p{font-size:1.02rem}
+@media (min-width:1200px){
+  /* photos become an inset collage on the right: one large, the others smaller beside the text */
+  section>.figs,section>.figs.single{float:right;clear:right;width:26rem;max-width:none;margin:.4rem calc(-1 * (var(--gutter) + var(--gap2))) 1.4rem 1.8rem;display:grid;grid-template-columns:1fr 1fr;gap:.6rem;grid-auto-flow:row}
+  section>.figs figure:first-child{grid-column:1/-1;grid-row:auto;display:block}
+  section>.figs figure:first-child img{aspect-ratio:16/10;height:auto;flex:none;min-height:0}
+  section>.figs.single figure:first-child img{aspect-ratio:4/3;height:auto}
+  section>.figs figure:not(:first-child) img{aspect-ratio:4/3}
+  section>.figs figure:not(:first-child) figcaption{font-size:.78rem;padding:.4rem .55rem .5rem;line-height:1.35}
+  section>.figs figure:not(:first-child) .credit{font-size:.7rem}
+  section>.figs figure:first-child figcaption{font-size:.85rem}
+  /* text blocks next to the collage narrow instead of running under it */
+  section>.rows,section>.callout,section>.inshort,section>.impact,section>.more,section>.caption,section>p{display:flow-root}
+  section>.rows,section>.more{display:block;overflow:hidden}
+  section.personal>.figs{float:none;width:auto;margin:1.4rem 0;display:block}
+  section.personal>.figs figure:first-child img{aspect-ratio:16/9}
+  #summary>.figs{width:18rem}
+  section>.figs figure:nth-child(2):last-child{grid-column:1/-1}
+  section>.figs figure:nth-child(2):last-child img{aspect-ratio:21/9}
+}
+@media (max-width:640px){
+  /* phones: photos in one clean swipe row */
+  .figs:not(.single){display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:.7rem;padding-bottom:.4rem;-webkit-overflow-scrolling:touch}
+  .figs:not(.single) figure{flex:0 0 84%;scroll-snap-align:start}
+  .figs:not(.single) figure img,.figs:not(.single) figure:first-child img{aspect-ratio:4/3}
+}
