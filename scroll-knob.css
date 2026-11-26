@@ -1,0 +1,101 @@
+/* Mobile-only scroll knob. Hidden on desktop (min-width 901px). Keyboard and screen-reader users keep the existing top-bar menu. */
+.scroll-knob{display:none}
+@media (max-width:900px){
+  .scroll-knob{
+    display:block;position:fixed;top:0;right:0;bottom:0;z-index:40;
+    width:4.2rem;pointer-events:none;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .scroll-knob *{box-sizing:border-box}
+  .scroll-knob .sk-rail{position:absolute;inset:0;pointer-events:none}
+  .scroll-knob .sk-icon{
+    position:absolute;right:.55rem;width:1.7rem;height:1.7rem;margin-top:-.85rem;
+    display:grid;place-items:center;
+    border-radius:999px;
+    background:rgba(18,24,32,.55);
+    border:1px solid rgba(140,190,255,.22);
+    color:#d6e7ff;
+    opacity:0;transform:translateX(10px) scale(.7);
+    pointer-events:none;
+    transition:opacity .18s ease,transform .18s ease,right .18s ease,background .18s ease;
+    z-index:1;
+  }
+  .scroll-knob .sk-icon svg{width:15px;height:15px;display:block;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .scroll-knob.is-held .sk-icon{opacity:.92;transform:translateX(0) scale(1);pointer-events:auto}
+  .scroll-knob .sk-icon.is-passed,
+  .scroll-knob .sk-icon.is-current{
+    right:3.35rem;background:rgba(28,48,74,.85);border-color:rgba(120,190,255,.45);
+  }
+  .scroll-knob .sk-icon.is-current{color:#fff;box-shadow:0 0 10px rgba(90,170,255,.35)}
+  .scroll-knob.is-held .sk-label{right:5.2rem}
+  .scroll-knob .sk-label{
+    position:absolute;right:4.2rem;transform:translateY(-50%);
+    max-width:11rem;padding:.28rem .6rem;
+    background:rgba(12,16,22,.78);color:#f2f5f8;
+    border:1px solid rgba(140,190,255,.25);border-radius:8px;
+    font-size:.78rem;font-weight:700;line-height:1.25;letter-spacing:.01em;
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    opacity:0;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    transition:opacity .15s ease;
+    z-index:3;
+  }
+  .scroll-knob.is-held .sk-label{opacity:1}
+  .scroll-knob .sk-thumb{
+    position:absolute;right:.35rem;width:22px;height:22px;margin-top:-11px;
+    border-radius:999px;pointer-events:auto;touch-action:none;cursor:grab;
+    border:1px solid rgba(160,210,255,.45);
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,.55) 0 18%, transparent 42%),
+      radial-gradient(circle at 50% 50%, rgba(90,170,255,.55), rgba(40,90,160,.28) 70%, rgba(20,32,50,.15));
+    box-shadow:0 0 10px rgba(80,160,255,.45), inset 0 1px 2px rgba(255,255,255,.35);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    z-index:4;
+    transition:width .16s ease,height .16s ease,margin-top .16s ease,right .16s ease,box-shadow .16s ease;
+  }
+  .scroll-knob.is-held .sk-thumb,
+  .scroll-knob.is-menu .sk-thumb{
+    width:52px;height:52px;margin-top:-26px;right:.2rem;cursor:grabbing;
+    box-shadow:0 0 22px rgba(80,170,255,.7), 0 0 6px rgba(140,200,255,.5), inset 0 1px 3px rgba(255,255,255,.45);
+  }
+  .scroll-knob.is-held .sk-thumb::after,
+  .scroll-knob.is-menu .sk-thumb::after{
+    content:"";position:absolute;inset:7px;border-radius:inherit;
+    border:1px solid rgba(255,255,255,.18);
+  }
+  .scroll-knob .sk-menu{
+    position:absolute;right:3.6rem;top:auto;bottom:max(1rem, env(safe-area-inset-bottom));
+    width:min(18.5rem, calc(100vw - 5.2rem));
+    max-height:min(28rem, calc(100dvh - 6rem));
+    overflow:auto;-webkit-overflow-scrolling:touch;
+    padding:.45rem;
+    background:rgba(10,16,24,.72);
+    border:1px solid rgba(140,190,255,.28);
+    border-radius:16px;
+    box-shadow:0 12px 40px rgba(0,0,0,.45), 0 0 24px rgba(70,150,255,.18);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    opacity:0;pointer-events:none;transform:translateX(8px) scale(.96);
+    transform-origin:right bottom;
+    transition:opacity .16s ease,transform .16s ease;
+    z-index:5;
+  }
+  .scroll-knob.is-menu .sk-menu{opacity:1;pointer-events:auto;transform:none}
+  .scroll-knob .sk-menu a{
+    display:flex;align-items:center;gap:.65rem;
+    padding:.45rem .55rem;border-radius:10px;
+    color:#e8eef6;text-decoration:none;font-size:.92rem;line-height:1.3;font-weight:600;
+  }
+  .scroll-knob .sk-menu a:hover,.scroll-knob .sk-menu a:focus-visible{background:rgba(80,150,255,.16)}
+  .scroll-knob .sk-menu a.is-here{background:rgba(80,150,255,.22);color:#fff}
+  .scroll-knob .sk-menu .sk-mi{
+    flex:0 0 1.7rem;width:1.7rem;height:1.7rem;display:grid;place-items:center;
+    border-radius:999px;background:rgba(28,48,74,.85);
+    border:1px solid rgba(120,190,255,.4);color:#d6e7ff;
+  }
+  .scroll-knob .sk-menu .sk-mi svg{width:15px;height:15px;display:block;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  /* Don't fight the existing "to top" button: tuck it left of the rail. */
+  .totop{right:4.4rem}
+}
+@media (max-width:900px) and (prefers-reduced-motion:reduce){
+  .scroll-knob .sk-icon,.scroll-knob .sk-label,.scroll-knob .sk-thumb,.scroll-knob .sk-menu{transition:none}
+}
