@@ -1,5 +1,5 @@
-// Mobile scroll knob: a small bubble on the right that tracks scroll.
-// Tap opens a section menu. Press and hold, then drag, to scrub the page.
+// Mobile scroll knob: a neon-glass bubble on the right that tracks scroll.
+// The same icons form the rail (hold to scrub) and unfold into the section list (tap).
 (() => {
   const mq = matchMedia('(max-width:900px)');
   if (!mq.matches) return;
@@ -7,7 +7,6 @@
   const sections = [...document.querySelectorAll('main section[id]')];
   if (!sections.length) return;
 
-  // Simple line icons, one set for EN and NL. Keys are section ids.
   const ICONS = {
     'summary': '<circle cx="12" cy="12" r="3"/><path d="M4 12h4M16 12h4M12 4v4M12 16v4"/>',
     'tesla-and-the-ev-push': '<path d="M5 16l2-8h10l2 8"/><circle cx="7.5" cy="16.5" r="1.6"/><circle cx="16.5" cy="16.5" r="1.6"/><path d="M9 10h6"/>',
@@ -36,15 +35,17 @@
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const root = document.createElement('div');
   root.className = 'scroll-knob';
-  root.innerHTML = `<div class="sk-rail" hidden></div>
-    <div class="sk-label" aria-hidden="true"></div>
-    <div class="sk-menu" hidden role="menu" aria-label="On this page"></div>
-    <button type="button" class="sk-thumb" aria-label="Scroll position. Tap for the list of sections, or hold and drag to move through the page." aria-haspopup="true" aria-expanded="false"></button>`;
+  root.dataset.glow = 'blue';
+  root.innerHTML = `<div class="sk-wash" aria-hidden="true"></div>
+    <div class="sk-rail" hidden role="menu" aria-label="On this page"></div>
+    <button type="button" class="sk-thumb" aria-label="Scroll position. Tap for the list of sections, or hold and drag to move through the page." aria-haspopup="true" aria-expanded="false">
+      <span class="sk-flare sk-flare-a" aria-hidden="true"></span>
+      <span class="sk-flare sk-flare-b" aria-hidden="true"></span>
+      <span class="sk-flare sk-flare-c" aria-hidden="true"></span>
+    </button>`;
   document.body.append(root);
   const rail = root.querySelector('.sk-rail');
   const thumb = root.querySelector('.sk-thumb');
-  const label = root.querySelector('.sk-label');
-  const menu = root.querySelector('.sk-menu');
 
   const titleOf = sec => {
     const a = document.querySelector('.sidenav a[href="#' + sec.id + '"], .navmenu a[href="#' + sec.id + '"]');
@@ -58,19 +59,14 @@
     a.href = '#' + sec.id;
     a.dataset.id = sec.id;
     const title = titleOf(sec);
+    a.setAttribute('role', 'menuitem');
     a.setAttribute('aria-label', title);
     a.dataset.title = title;
-    a.innerHTML = svg(sec.id);
+    a.innerHTML = '<span class="sk-name"></span><span class="sk-mi">' + svg(sec.id) + '</span>';
+    a.querySelector('.sk-name').textContent = title;
     a.addEventListener('click', e => { e.preventDefault(); jump(sec); });
     rail.append(a);
-    const m = document.createElement('a');
-    m.href = '#' + sec.id;
-    m.setAttribute('role', 'menuitem');
-    m.dataset.id = sec.id;
-    m.innerHTML = '<span class="sk-mi">' + svg(sec.id) + '</span><span>' + title.replace(/</g, '') + '</span>';
-    m.addEventListener('click', e => { e.preventDefault(); jump(sec); });
-    menu.append(m);
-    return { el: a, menu: m, sec, title };
+    return { el: a, sec, title };
   });
 
   const jump = sec => {
@@ -80,22 +76,14 @@
   };
 
   let padTop = 0, padBot = 0, track = 1, docH = 1, viewH = 1, maxY = 1;
-  let holding = false, menuOpen = false, holdTimer = 0, moved = false, startY = 0, startX = 0;
+  let holding = false, menuOpen = false, holdTimer = 0, foldTimer = 0, moved = false, startY = 0, startX = 0;
 
-  const measure = () => {
-    const cs = getComputedStyle(root);
-    padTop = 16 + (parseFloat(cs.paddingTop) || 0);
-    padBot = 16 + (parseFloat(cs.paddingBottom) || 0);
-    viewH = innerHeight;
-    track = Math.max(1, viewH - padTop - padBot);
-    docH = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
-    maxY = Math.max(1, docH - viewH);
+  const layoutMap = () => {
     icons.forEach(it => {
       const top = it.sec.getBoundingClientRect().top + scrollY;
       it.t = Math.min(1, Math.max(0, top / docH));
       it.y = padTop + it.t * track;
     });
-    // Keep icons from stacking when sections sit close together.
     const gap = 32;
     for (let i = 1; i < icons.length; i++) if (icons[i].y < icons[i-1].y + gap) icons[i].y = icons[i-1].y + gap;
     const floor = padTop + track;
@@ -107,7 +95,28 @@
       icons[0].y = padTop;
       for (let i = 1; i < icons.length; i++) if (icons[i].y < icons[i-1].y + gap) icons[i].y = icons[i-1].y + gap;
     }
-    icons.forEach(it => { it.el.style.top = it.y + 'px'; });
+  };
+
+  const layoutList = p => {
+    const n = icons.length, row = 34;
+    const cur = currentAt(p), ci = Math.max(0, icons.indexOf(cur));
+    const thumbY = padTop + p * track;
+    let start = thumbY - ci * row;
+    const total = Math.max(0, (n - 1) * row);
+    start = Math.min(Math.max(start, padTop), Math.max(padTop, padTop + track - total));
+    icons.forEach((it, i) => { it.listY = start + i * row; });
+  };
+
+  const measure = () => {
+    const cs = getComputedStyle(root);
+    padTop = 16 + (parseFloat(cs.paddingTop) || 0);
+    padBot = 16 + (parseFloat(cs.paddingBottom) || 0);
+    viewH = innerHeight;
+    track = Math.max(1, viewH - padTop - padBot);
+    docH = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+    maxY = Math.max(1, docH - viewH);
+    layoutMap();
+    if (!menuOpen && !root.classList.contains('is-folding')) icons.forEach(it => { it.el.style.top = it.y + 'px'; });
   };
 
   const progress = () => Math.min(1, Math.max(0, scrollY / maxY));
@@ -122,15 +131,12 @@
     placeThumb(p);
     const cur = currentAt(p);
     const thumbY = padTop + p * track;
-    label.textContent = cur.title;
-    label.style.top = thumbY + 'px';
     icons.forEach(it => {
-      const iconY = it.y;
-      const near = Math.abs(iconY - thumbY) < 34;
-      const passed = p + 0.008 >= it.t || near;
+      const iconY = menuOpen ? it.listY : it.y;
+      const near = !menuOpen && Math.abs(iconY - thumbY) < 34;
+      const passed = !menuOpen && (p + 0.008 >= it.t || near);
       it.el.classList.toggle('is-passed', passed);
-      it.el.classList.toggle('is-current', it === cur || near);
-      it.menu.classList.toggle('is-here', it === cur);
+      it.el.classList.toggle('is-current', it === cur);
     });
   };
 
@@ -138,34 +144,59 @@
 
   const setHeld = on => {
     holding = on;
+    if (on) { closeMenu(true); measure(); rail.hidden = false; }
     root.classList.toggle('is-held', on);
-    rail.hidden = !on;
+    if (!on && !menuOpen) rail.hidden = true;
     thumb.setAttribute('aria-pressed', on ? 'true' : 'false');
-    if (on) { closeMenu(); measure(); paint(progress()); }
+    if (on) paint(progress());
   };
 
   const openMenu = () => {
     if (holding) return;
+    clearTimeout(foldTimer);
+    measure();
+    const p = progress();
+    const thumbY = padTop + p * track;
+    rail.hidden = false;
+    // Start every icon on the bubble, then let them unfold into the list.
+    icons.forEach(it => {
+      it.el.style.transition = 'none';
+      it.el.style.top = thumbY + 'px';
+    });
+    layoutList(p);
     menuOpen = true;
     root.classList.add('is-menu');
-    menu.hidden = false;
+    root.classList.remove('is-folding');
     thumb.setAttribute('aria-expanded', 'true');
-    const r = thumb.getBoundingClientRect();
-    const mh = Math.min(menu.scrollHeight || 420, innerHeight - 24);
-    let top = r.top + r.height / 2 - mh / 2;
-    top = Math.max(12, Math.min(top, innerHeight - mh - 12));
-    menu.style.top = top + 'px';
-    menu.style.bottom = 'auto';
-    menu.style.maxHeight = mh + 'px';
-    const here = menu.querySelector('.is-here');
-    if (here) here.scrollIntoView({ block: 'nearest' });
+    paint(p);
+    requestAnimationFrame(() => {
+      icons.forEach(it => {
+        it.el.style.transition = '';
+        it.el.style.top = it.listY + 'px';
+      });
+    });
   };
-  const closeMenu = () => {
-    if (!menuOpen) return;
+
+  const closeMenu = instant => {
+    if (!menuOpen) { root.classList.remove('is-menu'); return; }
     menuOpen = false;
-    root.classList.remove('is-menu');
-    menu.hidden = true;
     thumb.setAttribute('aria-expanded', 'false');
+    const thumbY = padTop + progress() * track;
+    if (instant || reduce) {
+      root.classList.remove('is-menu', 'is-folding');
+      if (!holding) rail.hidden = true;
+      measure();
+      return;
+    }
+    // Fold the same icons back into the bubble.
+    root.classList.add('is-folding');
+    root.classList.remove('is-menu');
+    icons.forEach(it => { it.el.style.top = thumbY + 'px'; });
+    foldTimer = setTimeout(() => {
+      root.classList.remove('is-folding');
+      if (!holding && !menuOpen) rail.hidden = true;
+      measure();
+    }, 280);
   };
 
   const yToProgress = clientY => Math.min(1, Math.max(0, (clientY - padTop) / track));
@@ -179,7 +210,6 @@
     clearTimeout(holdTimer); holdTimer = 0;
     const wasHeld = holding;
     if (holding) setHeld(false);
-    // A short press with little movement is a tap → open (or close) the menu.
     if (!wasHeld && !moved) {
       if (menuOpen) closeMenu(); else openMenu();
     }
@@ -187,13 +217,11 @@
   };
 
   const startHold = ev => {
-    // Ignore non-primary buttons; allow touch and pen and left click.
     if (ev.pointerType === 'mouse' && ev.button !== 0) return;
     ev.preventDefault();
     moved = false;
     startY = ev.clientY; startX = ev.clientX;
     measure();
-    // Grow after a short press so a flick or a tap isn't treated as a drag.
     holdTimer = setTimeout(() => setHeld(true), 220);
     try { thumb.setPointerCapture(ev.pointerId); } catch (_) {}
   };
@@ -210,9 +238,7 @@
   });
   thumb.addEventListener('pointerup', release);
   thumb.addEventListener('pointercancel', ev => { moved = true; release(ev); });
-  thumb.addEventListener('lostpointercapture', () => { /* release already ran from pointerup */ });
 
-  // Keyboard: Enter/Space opens the glassy menu (the existing top-bar menu stays as a fallback).
   thumb.addEventListener('keydown', e => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); menuOpen ? closeMenu() : openMenu(); }
     if (e.key === 'Escape') closeMenu();
@@ -221,7 +247,20 @@
   addEventListener('pointerdown', e => { if (menuOpen && !root.contains(e.target)) closeMenu(); }, true);
 
   addEventListener('scroll', onScroll, { passive: true });
-  addEventListener('resize', () => { measure(); paint(progress()); }, { passive: true });
+  addEventListener('resize', () => { measure(); if (menuOpen) layoutList(progress()); paint(progress()); }, { passive: true });
   addEventListener('load', () => { measure(); paint(progress()); });
   measure(); paint(progress());
+
+  // Preview only: three glow hues that share the same neon-glass language. Default is mid blue.
+  if (document.querySelector('.preview-flag')) {
+    const bar = document.createElement('div');
+    bar.className = 'sk-variants';
+    bar.innerHTML = 'Glow <button type="button" data-glow="blue" class="is-on" aria-label="Blue glow (default)"></button><button type="button" data-glow="cyan" aria-label="Cyan glow"></button><button type="button" data-glow="ice" aria-label="Ice glow"></button>';
+    document.body.append(bar);
+    bar.addEventListener('click', e => {
+      const b = e.target.closest('button[data-glow]'); if (!b) return;
+      root.dataset.glow = b.dataset.glow;
+      bar.querySelectorAll('button').forEach(x => x.classList.toggle('is-on', x === b));
+    });
+  }
 })();

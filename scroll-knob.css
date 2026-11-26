@@ -1,101 +1,160 @@
-/* Mobile-only scroll knob. Hidden on desktop (min-width 901px). Keyboard and screen-reader users keep the existing top-bar menu. */
+/* Mobile-only scroll knob. Hidden on desktop (min-width 901px).
+   One visual language: neon-blue rim, soft outer glow, dark glass, fading frames.
+   The tap list is the same icon rail unfolding, not a separate popup. */
 .scroll-knob{display:none}
+.sk-variants{display:none}
+
 @media (max-width:900px){
   .scroll-knob{
+    --sk-rim: 170, 220, 255;
+    --sk-core: 50, 150, 255;
+    --sk-deep: 20, 80, 200;
     display:block;position:fixed;top:0;right:0;bottom:0;z-index:40;
     width:4.2rem;pointer-events:none;
     padding-top:env(safe-area-inset-top,0px);
     padding-bottom:env(safe-area-inset-bottom,0px);
   }
+  .scroll-knob[data-glow="cyan"]{--sk-rim:150,255,250;--sk-core:0,200,230;--sk-deep:0,110,170}
+  .scroll-knob[data-glow="ice"]{--sk-rim:210,235,255;--sk-core:130,185,255;--sk-deep:70,120,210}
   .scroll-knob *{box-sizing:border-box}
+  .scroll-knob.is-held,.scroll-knob.is-menu,.scroll-knob.is-folding{width:min(22rem,100vw)}
+
+  /* Soft column of light that the rail and list live inside */
+  .scroll-knob .sk-wash{
+    position:absolute;right:0;top:0;bottom:0;width:3.8rem;
+    pointer-events:none;opacity:0;
+    background:
+      radial-gradient(ellipse 70% 40% at 100% 50%, rgba(var(--sk-core),.22), transparent 70%),
+      linear-gradient(to left, rgba(8,18,36,.42), rgba(8,18,36,.16) 55%, transparent 100%);
+    -webkit-mask-image:linear-gradient(to bottom, transparent 0%, #000 8%, #000 92%, transparent 100%);
+            mask-image:linear-gradient(to bottom, transparent 0%, #000 8%, #000 92%, transparent 100%);
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    transition:opacity .28s ease,width .28s ease;
+  }
+  .scroll-knob.is-held .sk-wash{opacity:.7}
+  .scroll-knob.is-menu .sk-wash{
+    opacity:1;width:min(19.5rem, calc(100vw - 2.2rem));pointer-events:auto;
+    background:
+      radial-gradient(ellipse 90% 65% at 100% 50%, rgba(var(--sk-core),.2), transparent 72%),
+      linear-gradient(to left, rgba(8,18,36,.5) 0%, rgba(8,18,36,.28) 32%, rgba(8,18,36,.1) 62%, transparent 100%);
+  }
+
   .scroll-knob .sk-rail{position:absolute;inset:0;pointer-events:none}
+
+  /* Icon frames: the same glass language as the bubble, just quieter */
   .scroll-knob .sk-icon{
-    position:absolute;right:.55rem;width:1.7rem;height:1.7rem;margin-top:-.85rem;
-    display:grid;place-items:center;
-    border-radius:999px;
-    background:rgba(18,24,32,.55);
-    border:1px solid rgba(140,190,255,.22);
-    color:#d6e7ff;
+    position:absolute;right:.55rem;height:1.7rem;margin-top:-.85rem;
+    display:flex;align-items:center;gap:.55rem;
+    color:#d6e7ff;text-decoration:none;
     opacity:0;transform:translateX(10px) scale(.7);
     pointer-events:none;
-    transition:opacity .18s ease,transform .18s ease,right .18s ease,background .18s ease;
+    transition:opacity .22s ease,transform .28s ease,right .28s ease,top .28s ease;
     z-index:1;
   }
+  .scroll-knob .sk-mi{
+    flex:0 0 1.7rem;width:1.7rem;height:1.7rem;display:grid;place-items:center;
+    border-radius:999px;
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,.35) 0 22%, transparent 48%),
+      rgba(10,18,32,.4);
+    box-shadow:
+      0 0 0 1px rgba(var(--sk-rim),.55),
+      0 0 8px rgba(var(--sk-core),.45),
+      inset 0 0 6px rgba(var(--sk-core),.18);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    color:inherit;
+  }
   .scroll-knob .sk-icon svg{width:15px;height:15px;display:block;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-  .scroll-knob.is-held .sk-icon{opacity:.92;transform:translateX(0) scale(1);pointer-events:auto}
-  .scroll-knob .sk-icon.is-passed,
-  .scroll-knob .sk-icon.is-current{
-    right:3.35rem;background:rgba(28,48,74,.85);border-color:rgba(120,190,255,.45);
+  .scroll-knob .sk-name{
+    opacity:0;max-width:0;overflow:hidden;white-space:nowrap;
+    font-size:.9rem;font-weight:650;letter-spacing:.01em;color:#e8eef6;
+    text-shadow:0 0 14px rgba(var(--sk-core),.55);
+    pointer-events:none;
+    transition:opacity .22s ease,max-width .28s ease;
   }
-  .scroll-knob .sk-icon.is-current{color:#fff;box-shadow:0 0 10px rgba(90,170,255,.35)}
-  .scroll-knob.is-held .sk-label{right:5.2rem}
-  .scroll-knob .sk-label{
-    position:absolute;right:4.2rem;transform:translateY(-50%);
-    max-width:11rem;padding:.28rem .6rem;
-    background:rgba(12,16,22,.78);color:#f2f5f8;
-    border:1px solid rgba(140,190,255,.25);border-radius:8px;
-    font-size:.78rem;font-weight:700;line-height:1.25;letter-spacing:.01em;
-    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-    opacity:0;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    transition:opacity .15s ease;
-    z-index:3;
+  .scroll-knob.is-held .sk-icon,
+  .scroll-knob.is-menu .sk-icon,
+  .scroll-knob.is-folding .sk-icon{opacity:.92;transform:translateX(0) scale(1);pointer-events:auto}
+  .scroll-knob.is-held .sk-icon.is-passed{right:3.45rem}
+  .scroll-knob.is-held .sk-icon.is-current{right:4.85rem}
+  .scroll-knob.is-held .sk-icon.is-current .sk-mi,
+  .scroll-knob.is-menu .sk-icon.is-current .sk-mi{
+    color:#fff;
+    box-shadow:
+      0 0 0 1px rgba(var(--sk-rim),.95),
+      0 0 12px rgba(var(--sk-core),.7),
+      0 0 22px rgba(var(--sk-deep),.4),
+      inset 0 0 8px rgba(var(--sk-core),.25);
   }
-  .scroll-knob.is-held .sk-label{opacity:1}
+  .scroll-knob.is-held .sk-icon.is-current .sk-name,
+  .scroll-knob.is-menu .sk-icon .sk-name{
+    opacity:1;max-width:13.5rem;color:#fff;
+    text-shadow:0 1px 2px rgba(0,0,0,.65), 0 0 14px rgba(var(--sk-core),.8), 0 0 6px rgba(8,16,32,.9);
+  }
+  .scroll-knob.is-menu .sk-icon{right:3.9rem}
+  .scroll-knob.is-menu .sk-icon.is-current .sk-name{
+    color:#fff;text-shadow:0 0 16px rgba(var(--sk-rim),.85), 0 0 4px rgba(var(--sk-core),.6);
+  }
+
+  /* The bubble: thin bright neon rim, soft outer bloom, rim flares, dark glass */
   .scroll-knob .sk-thumb{
     position:absolute;right:.35rem;width:22px;height:22px;margin-top:-11px;
-    border-radius:999px;pointer-events:auto;touch-action:none;cursor:grab;
-    border:1px solid rgba(160,210,255,.45);
+    padding:0;border:0;border-radius:999px;
+    pointer-events:auto;touch-action:none;cursor:grab;
     background:
-      radial-gradient(circle at 32% 28%, rgba(255,255,255,.55) 0 18%, transparent 42%),
-      radial-gradient(circle at 50% 50%, rgba(90,170,255,.55), rgba(40,90,160,.28) 70%, rgba(20,32,50,.15));
-    box-shadow:0 0 10px rgba(80,160,255,.45), inset 0 1px 2px rgba(255,255,255,.35);
-    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+      radial-gradient(circle at 32% 26%, rgba(255,255,255,.55) 0 6%, rgba(var(--sk-rim),.28) 16%, transparent 38%),
+      radial-gradient(circle at 50% 50%, rgba(16,32,56,.06) 0 58%, rgba(6,14,28,.2) 100%);
+    box-shadow:
+      0 0 0 1.5px rgba(var(--sk-rim),.95),
+      0 0 5px 1px rgba(var(--sk-rim),.8),
+      0 0 14px 4px rgba(var(--sk-core),.5),
+      0 0 28px 9px rgba(var(--sk-deep),.32),
+      inset 0 0 8px rgba(var(--sk-core),.18);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
     z-index:4;
     transition:width .16s ease,height .16s ease,margin-top .16s ease,right .16s ease,box-shadow .16s ease;
   }
+  .scroll-knob .sk-thumb .sk-flare{
+    position:absolute;border-radius:999px;pointer-events:none;
+    background:radial-gradient(circle, rgba(255,255,255,.9) 0 35%, rgba(var(--sk-rim),.55) 55%, transparent 75%);
+  }
+  .scroll-knob .sk-thumb .sk-flare-a{width:22%;height:14%;left:20%;top:14%;filter:blur(.4px);opacity:.7}
+  .scroll-knob .sk-thumb .sk-flare-b{width:9%;height:9%;right:16%;top:26%;filter:blur(.3px);opacity:.65}
+  .scroll-knob .sk-thumb .sk-flare-c{width:7%;height:7%;left:32%;bottom:16%;filter:blur(.5px);opacity:.4}
+  .scroll-knob.is-held .sk-thumb .sk-flare-a,.scroll-knob.is-menu .sk-thumb .sk-flare-a{width:26%;height:18%;opacity:.85}
+  .scroll-knob.is-held .sk-thumb .sk-flare-b,.scroll-knob.is-menu .sk-thumb .sk-flare-b{width:11%;height:11%;opacity:.75}
   .scroll-knob.is-held .sk-thumb,
   .scroll-knob.is-menu .sk-thumb{
     width:52px;height:52px;margin-top:-26px;right:.2rem;cursor:grabbing;
-    box-shadow:0 0 22px rgba(80,170,255,.7), 0 0 6px rgba(140,200,255,.5), inset 0 1px 3px rgba(255,255,255,.45);
+    box-shadow:
+      0 0 0 2px rgba(var(--sk-rim),.95),
+      0 0 6px 2px rgba(var(--sk-rim),.8),
+      0 0 18px 5px rgba(var(--sk-core),.6),
+      0 0 36px 12px rgba(var(--sk-deep),.4),
+      inset 0 0 12px rgba(var(--sk-core),.22);
   }
-  .scroll-knob.is-held .sk-thumb::after,
-  .scroll-knob.is-menu .sk-thumb::after{
-    content:"";position:absolute;inset:7px;border-radius:inherit;
-    border:1px solid rgba(255,255,255,.18);
-  }
-  .scroll-knob .sk-menu{
-    position:absolute;right:3.6rem;top:auto;bottom:max(1rem, env(safe-area-inset-bottom));
-    width:min(18.5rem, calc(100vw - 5.2rem));
-    max-height:min(28rem, calc(100dvh - 6rem));
-    overflow:auto;-webkit-overflow-scrolling:touch;
-    padding:.45rem;
-    background:rgba(10,16,24,.72);
-    border:1px solid rgba(140,190,255,.28);
-    border-radius:16px;
-    box-shadow:0 12px 40px rgba(0,0,0,.45), 0 0 24px rgba(70,150,255,.18);
-    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-    opacity:0;pointer-events:none;transform:translateX(8px) scale(.96);
-    transform-origin:right bottom;
-    transition:opacity .16s ease,transform .16s ease;
-    z-index:5;
-  }
-  .scroll-knob.is-menu .sk-menu{opacity:1;pointer-events:auto;transform:none}
-  .scroll-knob .sk-menu a{
-    display:flex;align-items:center;gap:.65rem;
-    padding:.45rem .55rem;border-radius:10px;
-    color:#e8eef6;text-decoration:none;font-size:.92rem;line-height:1.3;font-weight:600;
-  }
-  .scroll-knob .sk-menu a:hover,.scroll-knob .sk-menu a:focus-visible{background:rgba(80,150,255,.16)}
-  .scroll-knob .sk-menu a.is-here{background:rgba(80,150,255,.22);color:#fff}
-  .scroll-knob .sk-menu .sk-mi{
-    flex:0 0 1.7rem;width:1.7rem;height:1.7rem;display:grid;place-items:center;
-    border-radius:999px;background:rgba(28,48,74,.85);
-    border:1px solid rgba(120,190,255,.4);color:#d6e7ff;
-  }
-  .scroll-knob .sk-menu .sk-mi svg{width:15px;height:15px;display:block;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-  /* Don't fight the existing "to top" button: tuck it left of the rail. */
+
   .totop{right:4.4rem}
+
+  /* Preview-only glow variants, shown when the preview banner is present */
+  .sk-variants{
+    display:flex;align-items:center;gap:.35rem;flex-wrap:wrap;
+    position:fixed;left:.6rem;bottom:calc(.6rem + env(safe-area-inset-bottom,0px));z-index:45;
+    padding:.3rem .45rem;border-radius:999px;
+    background:rgba(8,14,22,.55);color:#c9d6e8;font-size:.72rem;font-weight:650;
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    box-shadow:0 0 0 1px rgba(var(--sk-rim),.25), 0 0 16px rgba(var(--sk-core),.15);
+  }
+  .sk-variants button{
+    width:1.15rem;height:1.15rem;border-radius:999px;padding:0;cursor:pointer;
+    border:0;box-shadow:0 0 0 1px rgba(255,255,255,.2), 0 0 8px rgba(80,160,255,.35);
+  }
+  .sk-variants button[data-glow="blue"]{background:radial-gradient(circle at 35% 30%,#fff,rgb(50,150,255) 55%,rgb(20,80,200))}
+  .sk-variants button[data-glow="cyan"]{background:radial-gradient(circle at 35% 30%,#fff,rgb(0,210,230) 55%,rgb(0,110,170))}
+  .sk-variants button[data-glow="ice"]{background:radial-gradient(circle at 35% 30%,#fff,rgb(170,210,255) 55%,rgb(80,120,200))}
+  .sk-variants button.is-on{box-shadow:0 0 0 2px #fff, 0 0 10px rgba(140,210,255,.8)}
 }
+
 @media (max-width:900px) and (prefers-reduced-motion:reduce){
-  .scroll-knob .sk-icon,.scroll-knob .sk-label,.scroll-knob .sk-thumb,.scroll-knob .sk-menu{transition:none}
+  .scroll-knob .sk-icon,.scroll-knob .sk-name,.scroll-knob .sk-thumb,.scroll-knob .sk-wash{transition:none}
 }
