@@ -206,21 +206,52 @@
 
   const measure = () => {
     const cs = getComputedStyle(root);
-    padTop = 16 + (parseFloat(cs.paddingTop) || 0);
+    // Extra top pad so the large intro bubble (held/finger size) is not clipped.
+    padTop = 30 + (parseFloat(cs.paddingTop) || 0);
     padBot = 16 + (parseFloat(cs.paddingBottom) || 0);
     viewH = innerHeight;
     track = Math.max(1, viewH - padTop - padBot);
     docH = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
     maxY = Math.max(1, docH - viewH);
+    const tesla = document.getElementById('tesla-and-the-ev-push');
+    if (tesla) {
+      const header = document.querySelector('.topbar');
+      const headerH = header ? header.getBoundingClientRect().height : 0;
+      introEndY = Math.max(1, tesla.getBoundingClientRect().top + scrollY - headerH);
+    } else {
+      introEndY = Math.max(1, viewH * 0.85);
+    }
     layoutMap();
     if (!menuOpen && !root.classList.contains('is-folding')) railIcons.forEach(it => { it.el.style.top = it.y + 'px'; });
   };
 
   const progress = () => Math.min(1, Math.max(0, scrollY / maxY));
+  // At the top of the page the bubble is the held/finger size; it shrinks,
+  // scroll-linked and eased, to the normal 22px rest size by the start of Tesla.
+  // Transform-only (combined with the existing translate). Holding/menu use the
+  // CSS 52px size, so intro scale is 1 then.
+  const INTRO_SCALE = 52 / 22;
+  const easeInOutCubic = t => t < 0.5 ? 4 * t * t * t : 1 - ((-2 * t + 2) ** 3) / 2;
+  let introEndY = 1;
+  const introScale = () => {
+    if (holding || menuOpen) return 1;
+    const t = easeInOutCubic(Math.min(1, Math.max(0, scrollY / introEndY)));
+    return 1 + (INTRO_SCALE - 1) * (1 - t);
+  };
   const placeThumb = p => {
-    const y = `translate3d(0,${(padTop + p * track).toFixed(1)}px,0)`;
-    thumb.style.transform = y;
-    hintEl.style.transform = y;
+    const s = introScale();
+    const y = (padTop + p * track).toFixed(1);
+    thumb.style.transform = s === 1
+      ? `translate3d(0,${y}px,0)`
+      : `translate3d(0,${y}px,0) scale(${s.toFixed(3)})`;
+    const extra = (s - 1) * 11; // half the extra diameter; keep the hint clear of the larger bubble
+    // Keep the first-visit tip just below the sticky header so it does not cover title / EN|NL.
+    const headerH = document.querySelector('.topbar')?.getBoundingClientRect().height || 0;
+    let hintY = +y;
+    if (hintY < headerH + 16) hintY = headerH + 22;
+    hintEl.style.transform = extra
+      ? `translate3d(${(-extra - 8).toFixed(1)}px,${hintY.toFixed(1)}px,0)`
+      : `translate3d(0,${hintY.toFixed(1)}px,0)`;
   };
   const currentAt = p => {
     let cur = railIcons[0] || icons[0];
@@ -259,11 +290,16 @@
 
   const setHeld = on => {
     if (on) dismissHint();
+    // If we snap from intro scale (~52px via transform) to the CSS 52px held
+    // size, disable the width transition for a frame so it does not shrink then grow.
+    const fromIntro = on && introScale() > 1.05;
+    if (fromIntro) thumb.style.transition = 'none';
     holding = on;
     docEl.classList.toggle('sk-scrubbing', on);
     if (on) { closeMenu(true); measure(); rail.hidden = false; }
     else { pendingY = null; }
     root.classList.toggle('is-held', on);
+    if (fromIntro) requestAnimationFrame(() => { thumb.style.transition = ''; });
     if (!on && !menuOpen) {
       railIcons.forEach(it => { it.arc = 0; it.el.style.setProperty('--sk-arc', '0px'); it.el.classList.remove('is-arc'); });
       rail.hidden = true;
