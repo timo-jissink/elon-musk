@@ -2,9 +2,8 @@
    and the soft glow pill for the current section — no knob on desktop.
    One visual language: neon-blue rim, soft outer glow, dark glass, frames that fade to the left.
    The tap list is the same icon rail unfolding, not a separate popup.
-   Bubble options a|b|c|d all lean to the mid-blue neon glow; a is the default (closest). */
+   Production look is option A. ?bubble=b|c|d still selects the other mid-blue variants if present. */
 .scroll-knob{display:none}
-.sk-variants{display:none}
 
 @media (max-width:900px){
   .scroll-knob{
@@ -237,25 +236,6 @@
   }
 
   .totop{right:4.4rem}
-
-  .sk-variants{
-    display:flex;align-items:center;gap:.35rem;flex-wrap:wrap;
-    position:fixed;left:.6rem;bottom:calc(.6rem + env(safe-area-inset-bottom,0px));z-index:45;
-    padding:.3rem .45rem;border-radius:999px;
-    background:rgba(8,14,22,.55);color:#c9d6e8;font-size:.72rem;font-weight:650;
-    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-    box-shadow:0 0 0 1px rgba(170,220,255,.25), 0 0 16px rgba(50,150,255,.15);
-  }
-  .sk-variants button{
-    min-width:1.35rem;height:1.35rem;border-radius:999px;padding:0 .3rem;cursor:pointer;
-    border:0;color:#e8f2ff;font-size:.68rem;font-weight:800;
-    background:radial-gradient(circle at 35% 30%,#fff,rgb(50,150,255) 55%,rgb(20,80,200));
-    box-shadow:0 0 0 1px rgba(255,255,255,.2), 0 0 8px rgba(80,160,255,.35);
-  }
-  .sk-variants button[data-bubble="b"]{background:radial-gradient(circle at 35% 30%,#fff,rgb(90,170,255) 50%,rgb(40,100,210))}
-  .sk-variants button[data-bubble="c"]{background:radial-gradient(circle at 35% 30%,#fff,rgb(40,150,255) 45%,rgb(10,70,200))}
-  .sk-variants button[data-bubble="d"]{background:radial-gradient(circle at 35% 30%,#cfe4ff,rgb(40,110,220) 55%,rgb(8,40,120))}
-  .sk-variants button.is-on{box-shadow:0 0 0 2px #fff, 0 0 10px rgba(140,210,255,.8)}
 
   /* First-visit hint: slow breath on the bubble, small glow tip to its left. */
   .scroll-knob .sk-hint{

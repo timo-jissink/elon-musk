@@ -113,6 +113,7 @@
   const LIST_ONLY = new Set(['starlink-in-ukraine']);
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Default look is option A. ?bubble=a|b|c|d is still honoured if present, otherwise ignored.
   const params = new URLSearchParams(location.search);
   const bubbleOpt = /^[abcd]$/.test(params.get('bubble') || '') ? params.get('bubble') : 'a';
   const root = document.createElement('div');
@@ -471,26 +472,5 @@
     hintEl.hidden = false;
     root.classList.add('is-hint');
     hintTimer = setTimeout(dismissHint, 4000);
-  }
-
-  // Preview: four mid-blue neon options, ?bubble=a|b|c|d, default a (closest to the mid glow).
-  if (document.querySelector('.preview-flag')) {
-    const bar = document.createElement('div');
-    bar.className = 'sk-variants';
-    bar.innerHTML = 'Bubble ' + ['a','b','c','d'].map(k =>
-      `<button type="button" data-bubble="${k}"${k===bubbleOpt?' class="is-on"':''} aria-label="Bubble option ${k.toUpperCase()}">${k.toUpperCase()}</button>`
-    ).join('');
-    document.body.append(bar);
-    const apply = k => {
-      root.dataset.bubble = k;
-      bar.querySelectorAll('button').forEach(x => x.classList.toggle('is-on', x.dataset.bubble === k));
-      const url = new URL(location.href);
-      url.searchParams.set('bubble', k);
-      history.replaceState(null, '', url);
-    };
-    bar.addEventListener('click', e => {
-      const b = e.target.closest('button[data-bubble]'); if (!b) return;
-      apply(b.dataset.bubble);
-    });
   }
 })();
