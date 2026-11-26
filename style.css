@@ -22,7 +22,10 @@ img{max-width:100%;height:auto;display:block}
 .topbar{position:sticky;top:0;z-index:20;background:rgba(11,13,17,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .topbar-in{max-width:var(--wide);margin:auto;display:flex;align-items:center;gap:1rem;padding:.6rem 1.2rem}
 .brand{font-weight:700;color:var(--text);text-decoration:none;font-size:1rem;white-space:nowrap}
-.navmenu{margin-left:auto;position:relative}
+/* The old mobile "Sections" header button is unused now: the scroll knob
+   is the mobile ToC, and desktop already uses the sidenav. Kept in the HTML
+   so nav.js can still mark those links, but hidden at every width. */
+.navmenu{display:none}
 .navmenu summary{cursor:pointer;list-style:none;border:1px solid var(--line);border-radius:999px;padding:.25rem .9rem;font-size:.95rem;color:var(--muted)}
 .navmenu summary::-webkit-details-marker{display:none}
 .navmenu[open] summary{color:var(--text)}
@@ -114,8 +117,9 @@ footer .in{max-width:var(--wide);margin:auto;padding:2rem 1.2rem 3rem}
 @media (max-width:900px){
   .layout{grid-template-columns:1fr;gap:0}
   .sidenav{display:none}
+  /* Leave room on the right for the scroll-knob bubble so EN|NL stays clear. */
+  .topbar-in{padding-right:3.25rem}
 }
-@media (min-width:901px){ .navmenu{display:none} }
 @media (max-width:640px){
   body{font-size:1.08rem;line-height:1.75}
   .hero{min-height:70vh;flex-direction:column;justify-content:flex-end;align-items:stretch}
@@ -344,7 +348,7 @@ table.calc-mini tr.calc-total th,table.calc-mini tr.calc-total td{font-weight:70
 .langswitch .sep{color:#3a4350}
 .pullquote .translation{font-size:.82em;font-weight:400;color:var(--muted);margin-top:.4rem}
 .langswitch,.navmenu{flex-shrink:0}
-@media (max-width:600px){ .topbar-in{gap:.5rem;padding:.55rem .9rem} .brand{white-space:normal;min-width:0;flex:1;font-size:.92rem;line-height:1.25} .langswitch{font-size:.85rem;gap:.15rem} }
+@media (max-width:600px){ .topbar-in{gap:.5rem;padding:.55rem .9rem;padding-right:3.25rem} .brand{white-space:normal;min-width:0;flex:1;font-size:.92rem;line-height:1.25} .langswitch{font-size:.85rem;gap:.15rem} }
 /* Starship method box: folded by default */
 .calc-fold > summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;align-items:baseline;gap:.2rem .6rem}
 .calc-fold > summary::-webkit-details-marker{display:none}
