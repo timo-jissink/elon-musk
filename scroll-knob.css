@@ -111,7 +111,9 @@
     -webkit-mask-image:linear-gradient(to left, #000 22%, rgba(0,0,0,.45) 55%, transparent 100%);
             mask-image:linear-gradient(to left, #000 22%, rgba(0,0,0,.45) 55%, transparent 100%);
   }
-  .scroll-knob .sk-logo{width:16px;height:16px;display:block;fill:currentColor}
+  .scroll-knob .sk-mi{overflow:visible}
+  .scroll-knob .sk-logo{width:16px;height:16px;display:block;fill:currentColor;overflow:visible}
+  .scroll-knob .sk-logo.is-spacex{width:22px;height:22px;margin:-3px}
   .scroll-knob .sk-logo [fill="none"]{fill:none}
   .scroll-knob .sk-name{
     opacity:0;max-width:0;overflow:hidden;white-space:nowrap;

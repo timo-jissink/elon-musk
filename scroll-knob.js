@@ -7,8 +7,8 @@
   const sections = [...document.querySelectorAll('main section[id]')];
   if (!sections.length) return;
 
-  // Company logos: Simple Icons (CC0) where available; otherwise a faithful simple mark.
-  // Simple Icons: Tesla, SpaceX, X, OpenAI, PayPal. Starlink is not in the set.
+  // Company logos: Simple Icons (CC0) where available; otherwise the official mark
+  // (see comments). Simple Icons: Tesla, SpaceX, X, OpenAI, PayPal.
   const SI = {
     tesla: `M12 5.362l2.475-3.026s4.245.09 8.471 2.054c-1.082 1.636-3.231 2.438-3.231 2.438-.146-1.439-1.154-1.79-4.354-1.79L12 24 8.619 5.034c-3.18 0-4.188.354-4.335 1.792 0 0-2.146-.795-3.229-2.43C5.28 2.431 9.525 2.34 9.525 2.34L12 5.362l-.004.002H12v-.002zm0-3.899c3.415-.03 7.326.528 11.328 2.28.535-.968.672-1.395.672-1.395C19.625.612 15.528.015 12 0 8.472.015 4.375.61 0 2.349c0 0 .195.525.672 1.396C4.674 1.989 8.585 1.435 12 1.46v.003z`,
     spacex: `M24 7.417C8.882 8.287 1.89 14.75.321 16.28L0 16.583h2.797C10.356 9.005 21.222 7.663 24 7.417zm-17.046 6.35c-.472.321-.945.68-1.398 1.02l2.457 1.796h2.778zM2.948 10.8H.189l3.25 2.381c.473-.321 1.02-.661 1.512-.945Z`,
@@ -19,21 +19,37 @@
   const p = d => `<path d="${d}"/>`;
   const LOGOS = {
     tesla: p(SI.tesla),
-    spacex: `<g transform="translate(0,1.2) scale(1,1.35)">${p(SI.spacex)}</g>`,
-    // Starlink brand mark: four-pointed star (not in Simple Icons).
-    starlink: p(`M12 .6l1.55 8.7L23.4 12l-9.85 2.7L12 23.4l-1.55-8.7L.6 12l9.85-2.7L12 .6z`),
+    // SpaceX SI mark, scaled/centered; swoosh tail is allowed to peek past the circle.
+    spacex: `<g class="sk-spacex" transform="translate(12,12.2) scale(1.22) translate(-12,-13)">${p(SI.spacex)}</g>`,
+    // Official Starlink 2024 Hohmann-transfer mark (same geometry as
+    // Wikimedia File:Starlink Logo 2024.svg / starlink.com): two concentric
+    // orbits, a downward-shifted transfer orbit, Sun + two planets.
+    // Strokes and dots are thickened for rail / menu-pill size; the official
+    // hairlines would vanish at 16px. PD-textlogo / PD-shape; trademark of
+    // Starlink Services, LLC / SpaceX. Wordmark omitted (illegible at 16px).
+    starlink: `<g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="11.7" r="9.05"/>
+      <circle cx="12" cy="11.7" r="5.15"/>
+      <circle cx="12" cy="13.55" r="7.15"/>
+      <circle cx="12" cy="11.7" r="1.55" fill="currentColor" stroke="none"/>
+      <circle cx="12" cy="6.55" r="1.35" fill="currentColor" stroke="none"/>
+      <circle cx="12" cy="20.75" r="1.2" fill="currentColor" stroke="none"/>
+    </g>`,
     x: p(SI.x),
     openai: p(SI.openai),
     paypal: p(SI.paypal),
-    // Energy: Tesla T + a small lightning bolt.
-    energy: `<g transform="translate(-1.4,0) scale(0.78)">${p(SI.tesla)}</g><path d="M19.4 6.8 16.7 13.2h2.6L14.8 21.5 16.7 14.8h-2.7L19.4 6.8z"/>`,
-    // Neuralink: implant puck with thread leads (simple mark).
-    neuralink: `<circle cx="15.2" cy="12" r="4.3"/><path d="M11.6 9.6C7.2 7.2 4.2 5.4 2.4 3.8M11.2 12H2.2M11.6 14.4C7.2 16.8 4.2 18.6 2.4 20.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`,
+    // Energy: Tesla T as the main, centered mark; small bolt offset to the right.
+    energy: `<g transform="translate(-0.2,0.2) scale(0.86)">${p(SI.tesla)}</g><path d="M20.4 8.2 18.6 12.4h1.7L17.2 18.8l1.3-4.1h-1.8L20.4 8.2z"/>`,
+    // Official Neuralink symbol from the neuralink.com header (26 Nov 2026).
+    // Trademark of Neuralink Corp. Older Wikimedia wordmark is PD-textlogo but
+    // unreadable at this size, so the official compact emblem is used instead.
+    neuralink: `<g transform="translate(1.6,5.5) scale(0.3714)"><path fill="currentColor" fill-rule="evenodd" d="M30.8777 22.4886H0.705078L22.5011 2.28693C24.3585 0.565492 27.0293 -0.000275522 29.47 0.809903C31.9102 1.62058 33.6439 3.6498 33.994 6.10498L37.476 30.5019C37.5803 31.2306 38.0767 31.8049 38.8036 32.0367C39.5305 32.2696 40.2868 32.0946 40.8255 31.572L50.1712 22.4886H39.4676L39.1096 20.2688H55.7051L42.4717 33.131C41.6499 33.9302 40.5593 34.3566 39.4367 34.3566C38.9823 34.3566 38.5221 34.2862 38.073 34.1429C36.5143 33.6455 35.4074 32.3656 35.1842 30.8031L31.7021 6.40672C31.4673 4.75921 30.3499 3.45166 28.7127 2.90802C27.0759 2.36337 25.3548 2.72899 24.108 3.88365L6.42923 20.2688H30.5522L30.8777 22.4886Z"/></g>`,
     // The Boring Company wordmark vanishes at this size; tunnel portal mark instead.
     boring: `<path d="M4 20V11.2A8 8 0 0 1 20 11.2V20" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round"/><path d="M8 20V12.1a4 4 0 0 1 8 0V20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/><path d="M4 20h16" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>`,
-    // xAI six-point spark (simple mark).
-    xai: p("M12 1.4l1.15 7.05L20.6 6.2l-4.7 5.4 6.7 2.4-6.7 2.4 4.7 5.4-7.45-2.25L12 22.6l-1.15-7.05L3.4 17.8l4.7-5.4-6.7-2.4 6.7-2.4-4.7-5.4 7.45 2.25z"),
-    // DOGE (Department of Government Efficiency): shield with a D. Not on a rail slot (no DOGE section).
+    // Official xAI mark. Source: Wikimedia Commons File:XAI-Logo.svg (from x.ai).
+    // PD-textlogo / simple geometry; trademark of xAI (X.AI Corp.).
+    xai: `<g fill="currentColor"><polygon points="0.12 182.71 234.14 516.92 338.15 516.92 104.13 182.71 0.12 182.71"/><polygon points="0 516.92 104.08 516.92 156.08 442.67 104.04 368.34 0 516.92"/><polygon points="466.04 0 361.96 0 182.1 256.86 234.15 331.18 466.04 0"/><polygon points="380.78 516.92 466.04 516.92 466.04 37.16 380.78 158.92 380.78 516.92"/></g>`,
+    //     // DOGE (Department of Government Efficiency): shield with a D. Not on a rail slot (no DOGE section).
     doge: `<path d="M12 2.2l7.2 3v7.3c0 4.4-3 7.6-7.2 9.5-4.2-1.9-7.2-5.1-7.2-9.5V5.2L12 2.2z"/><path d="M10 8.1h2.4c2.15 0 3.5 1.35 3.5 3.4s-1.35 3.4-3.5 3.4H10V8.1zm1.55 1.45v3.9h.85c1.2 0 1.9-.7 1.9-1.95s-.7-1.95-1.9-1.95h-.85z" fill="#0b1220"/>`
   };
   // Generic monochrome marks for remaining sections (not company sub-topics).
@@ -41,18 +57,18 @@
     summary: p("M12 3.2 14.2 9h6.3l-5.1 3.8 1.9 6.2L12 15.6 6.7 19l1.9-6.2L3.5 9h6.3z"),
     contested: `<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v5M12 16.5h.01" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`,
     speech: LOGOS.x,
-    style: `<circle cx="8" cy="9" r="2.2"/><circle cx="16" cy="9" r="2.2"/><path d="M4.5 16c1-2.4 2.8-3.5 3.5-3.5S10 13.6 11 16M13 16c1-2.4 2.8-3.5 3.5-3.5S19 13.6 20 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`,
+    style: `<circle cx="7.5" cy="8" r="3.35"/><circle cx="16.5" cy="8" r="3.35"/><path d="M3 19c1.3-3.4 3.5-5 4.5-5s3.2 1.6 4.5 5M12 19c1.3-3.4 3.5-5 4.5-5s3.2 1.6 4.5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`,
     timelines: `<rect x="4" y="5" width="16" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 3v4M16 3v4M4 10h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`,
-    lawsuits: `<path d="M12 3v18M5 8h14M7 8l-2 5h4l-2 8M17 8l-2 5h4l-2 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`,
-    criticism: `<path d="M5 4v16M5 7h8M5 12h11M5 17h6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`,
+    lawsuits: `<g fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.6v13.6M7.2 20.4h9.6"/><path d="M12 4.6 4.4 8.4h15.2z" /><path d="M5.4 8.4 3.4 13.4c0 .15 1.9 1.35 3.6 1.35s3.6-1.2 3.6-1.35L8.6 8.4"/><path d="M15.4 8.4 13.4 13.4c0 .15 1.9 1.35 3.6 1.35s3.6-1.2 3.6-1.35L18.6 8.4"/></g>`,
+    criticism: `<g fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 9h4.2l9.2-4.8v15.6L8 15H3.8z"/><path d="M8.2 15.2v3.4l-2.8 1.2"/><path d="M19.2 10c1.15.7 1.15 3.3 0 4"/></g>`,
     scorecard: `<path d="M5 12l4 4 10-10M4 19h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>`,
-    human: `<circle cx="12" cy="8" r="3"/><path d="M5.5 19c0-3.4 2.9-5.5 6.5-5.5s6.5 2.1 6.5 5.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`,
-    note: `<path d="M7 4h8l4 4v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15 4v4h4M9 13h6M9 17h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`,
+    human: `<circle cx="10.2" cy="7.6" r="3.15"/><path d="M4.4 19.4c0-3.5 2.6-5.7 5.8-5.7s5.8 2.2 5.8 5.7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M16.35 8.15c0-1.2 1.05-1.9 1.95-1.15.9-.75 1.95-.05 1.95 1.15 0 1.4-1.95 2.7-1.95 2.7s-1.95-1.3-1.95-2.7z" fill="currentColor"/>`,
+    note: `<g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M8.6 14.2c-2.1 0-3.8-1.6-3.8-3.6 0-1.6 1.1-3 2.6-3.5.5-2.1 2.4-3.5 4.6-3.5 1.6 0 3 .7 3.9 1.9 1.2-.8 2.9-.6 3.9.7 1.1.4 1.9 1.6 1.9 2.9 0 1.8-1.4 3.3-3.1 3.5-.3 1.6-1.8 2.8-3.6 2.8-1.1 0-2.1-.5-2.8-1.2-.7.6-1.6.9-2.6.9z"/><circle cx="6.7" cy="16.8" r="1.5"/><circle cx="4.3" cy="20.15" r=".9"/></g>`,
     sources: `<path d="M7 4h8a2 2 0 0 1 2 2v14l-6-2-6 2V6a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`,
     credits: `<rect x="4" y="6" width="16" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="11" r="1.6"/><path d="M4 16l4.5-3.5L13 16l3-2.5 4 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>`
   };
   // OpenAI + xAI share one section: both marks, side by side.
-  LOGOS.openai_xai = `<g transform="translate(-1.2,1) scale(0.6)">${LOGOS.openai}</g><g transform="translate(10.4,1) scale(0.58)">${LOGOS.xai}</g>`;
+  LOGOS.openai_xai = `<g transform="translate(0.7,6.2) scale(0.4833)">${LOGOS.openai}</g><g transform="translate(12.7,6.2) scale(0.02244)">${LOGOS.xai}</g>`;
 
   const BY_ID = {
     'tesla-and-the-ev-push': LOGOS.tesla,
@@ -104,7 +120,7 @@
     const a = document.querySelector('.sidenav a[href="#' + sec.id + '"], .navmenu a[href="#' + sec.id + '"]');
     return ((a && a.textContent) || (sec.querySelector('h2') || {}).textContent || sec.id).trim();
   };
-  const svgFor = id => '<svg class="sk-logo" viewBox="0 0 24 24" aria-hidden="true">' + (BY_ID[id] || FALLBACK) + '</svg>';
+  const svgFor = id => '<svg class="sk-logo' + (id==='spacex' ? ' is-spacex' : '') + '" viewBox="0 0 24 24" overflow="visible" aria-hidden="true">' + (BY_ID[id] || FALLBACK) + '</svg>';
 
   const icons = sections.map(sec => {
     const a = document.createElement('a');
