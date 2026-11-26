@@ -27,12 +27,13 @@
   /* d: deeper navy glass, same blue family, quieter flares */
   .scroll-knob[data-bubble="d"]{--sk-rim:150,205,255;--sk-core:30,110,220;--sk-deep:4,28,90;--sk-fill:.42;--sk-rim-w:1.55px;--sk-bloom:20px}
   .scroll-knob *{box-sizing:border-box}
-  .scroll-knob.is-held,.scroll-knob.is-menu,.scroll-knob.is-folding{width:min(22rem,100vw)}
+  .scroll-knob.is-held,.scroll-knob.is-menu,.scroll-knob.is-folding,.scroll-knob.is-unfolding,
+  .scroll-knob.is-hint,.scroll-knob.is-hint-out{width:min(22rem,100vw)}
 
   /* Rail background: dark-translucent + mid-blue neon glow. Its LEFT edge fades to fully
      transparent over the last 75px (horizontal mask) and top/bottom fade out too (vertical mask),
      so there is no hard edge anywhere. */
-  .scroll-knob{--sk-fade:75px}
+  .scroll-knob{--sk-fade:75px;--sk-pill-pad:1.15rem}
   .scroll-knob .sk-wash{
     position:absolute;right:0;top:0;bottom:0;width:calc(3.4rem + var(--sk-fade));
     pointer-events:none;opacity:0;
@@ -75,14 +76,15 @@
      It belongs to .sk-icon, so it moves with the icon along the arc. */
   .scroll-knob .sk-icon::before{
     content:"";position:absolute;pointer-events:none;z-index:-1;
-    inset:-.2rem -.25rem -.2rem -3.2rem;border-radius:999px;
+    inset:-.2rem -.25rem -.2rem calc(-1 * var(--sk-pill-pad));border-radius:999px;
     background:
       radial-gradient(circle at calc(100% - .95rem) 50%, rgba(var(--sk-core),.34) 0, rgba(var(--sk-core),.12) .95rem, transparent 1.9rem),
-      linear-gradient(to left, rgba(var(--sk-core),.20) 0, rgba(var(--sk-core),.08) 45%, transparent 100%),
-      linear-gradient(to left, rgba(8,18,36,.38) 0, rgba(8,18,36,.16) 50%, transparent 100%);
+      linear-gradient(to left, rgba(var(--sk-core),.16), rgba(var(--sk-core),.10)),
+      linear-gradient(to left, rgba(8,18,36,.40), rgba(8,18,36,.28));
     box-shadow:0 0 14px rgba(var(--sk-core),.22);
-    -webkit-mask-image:linear-gradient(to left, #000 1.9rem, rgba(0,0,0,.55) 45%, transparent 100%);
-            mask-image:linear-gradient(to left, #000 1.9rem, rgba(0,0,0,.55) 45%, transparent 100%);
+    /* Fade sits in the left pad only — every letter keeps a full translucent backing. */
+    -webkit-mask-image:linear-gradient(to right, transparent 0, #000 1rem, #000 100%);
+            mask-image:linear-gradient(to right, transparent 0, #000 1rem, #000 100%);
   }
   .scroll-knob.is-held .sk-icon{
     transition:opacity .18s ease; /* no transform lag while scrubbing the arc */
@@ -91,7 +93,8 @@
   }
   .scroll-knob.is-held .sk-icon.is-list-only{display:none}
   .scroll-knob.is-menu .sk-icon.is-list-only,
-  .scroll-knob.is-folding .sk-icon.is-list-only{display:flex}
+  .scroll-knob.is-folding .sk-icon.is-list-only,
+  .scroll-knob.is-unfolding .sk-icon.is-list-only{display:flex}
 
   /* Transparent neon-blue frame that fades to nothing going left */
   .scroll-knob .sk-mi{
@@ -119,9 +122,9 @@
   }
   .scroll-knob.is-held .sk-icon,
   .scroll-knob.is-menu .sk-icon,
-  .scroll-knob.is-folding .sk-icon{opacity:.92;pointer-events:auto}
-  .scroll-knob.is-menu .sk-icon,
-  .scroll-knob.is-folding .sk-icon{transform:none}
+  .scroll-knob.is-unfolding .sk-icon{opacity:.92;pointer-events:auto}
+  .scroll-knob.is-menu .sk-icon{transform:none}
+  .scroll-knob.is-folding .sk-icon{opacity:.92;pointer-events:none} /* start value; inline opacity 0 fades from here */
   .scroll-knob.is-held .sk-icon.is-current .sk-mi,
   .scroll-knob.is-menu .sk-icon.is-current .sk-mi{
     color:#fff;
@@ -132,25 +135,56 @@
     box-shadow:0 0 12px rgba(var(--sk-core),.7), 0 0 22px rgba(var(--sk-deep),.4);
   }
   .scroll-knob.is-held .sk-icon.is-current .sk-name,
-  .scroll-knob.is-menu .sk-icon .sk-name{
+  .scroll-knob.is-menu .sk-icon .sk-name,
+  .scroll-knob.is-folding .sk-icon .sk-name,
+  .scroll-knob.is-unfolding .sk-icon .sk-name{
     opacity:1;max-width:13.5rem;color:#fff;
     text-shadow:0 1px 2px rgba(0,0,0,.65), 0 0 14px rgba(var(--sk-core),.8), 0 0 6px rgba(8,16,32,.9);
   }
-  .scroll-knob.is-menu .sk-icon{right:3.9rem}
+  .scroll-knob.is-menu .sk-icon,
+  .scroll-knob.is-folding .sk-icon,
+  .scroll-knob.is-unfolding .sk-icon{right:3.9rem}
+  /* Pill hugs icon+label; left inset is the fade pad, sitting past the first letter. */
   .scroll-knob.is-menu .sk-icon::before,
-  .scroll-knob.is-folding .sk-icon::before{
-    inset:-.14rem -.28rem -.14rem -.7rem;           /* hugs label + icon (row width = text width) */
+  .scroll-knob.is-folding .sk-icon::before,
+  .scroll-knob.is-unfolding .sk-icon::before{
+    inset:-.14rem -.28rem -.14rem calc(-1 * var(--sk-pill-pad));
     box-shadow:0 0 12px rgba(var(--sk-core),.28);
-    -webkit-mask-image:linear-gradient(to left, #000 1.9rem, rgba(0,0,0,.7) 38%, transparent 100%);
-            mask-image:linear-gradient(to left, #000 1.9rem, rgba(0,0,0,.7) 38%, transparent 100%);
   }
-  .scroll-knob.is-menu .sk-icon::after{
-    content:"";position:absolute;inset:-.14rem -.28rem -.14rem -.7rem;z-index:-1;
+  .scroll-knob.is-menu .sk-icon::after,
+  .scroll-knob.is-folding .sk-icon::after,
+  .scroll-knob.is-unfolding .sk-icon::after{
+    content:"";position:absolute;inset:-.14rem -.28rem -.14rem calc(-1 * var(--sk-pill-pad));z-index:-1;
     border-radius:999px;pointer-events:none;
     border:1.3px solid rgba(var(--sk-rim),.8);
-    -webkit-mask-image:linear-gradient(to left, #000 12%, rgba(0,0,0,.5) 42%, transparent 88%);
-            mask-image:linear-gradient(to left, #000 12%, rgba(0,0,0,.5) 42%, transparent 88%);
+    -webkit-mask-image:linear-gradient(to right, transparent 0, #000 1rem, #000 100%);
+            mask-image:linear-gradient(to right, transparent 0, #000 1rem, #000 100%);
   }
+
+  /* Fold/unfold: only transform + opacity. Drop glow shadows and backdrop-filter so
+     overlapping rows stay cheap and don't stutter as they meet at the bubble. */
+  .scroll-knob.is-folding .sk-icon,
+  .scroll-knob.is-unfolding .sk-icon{
+    transition:transform .34s ease,opacity .28s ease;
+    pointer-events:none;
+  }
+  .scroll-knob.is-folding .sk-wash,
+  .scroll-knob.is-unfolding .sk-wash{
+    backdrop-filter:none;-webkit-backdrop-filter:none;
+  }
+  .scroll-knob.is-unfolding .sk-wash{
+    opacity:1;width:min(19.5rem, calc(100vw - 1.2rem));
+  }
+  .scroll-knob.is-folding .sk-icon::before,
+  .scroll-knob.is-folding .sk-icon::after,
+  .scroll-knob.is-unfolding .sk-icon::before,
+  .scroll-knob.is-unfolding .sk-icon::after,
+  .scroll-knob.is-folding .sk-mi::after,
+  .scroll-knob.is-unfolding .sk-mi::after{
+    box-shadow:none;
+  }
+  .scroll-knob.is-folding .sk-name,
+  .scroll-knob.is-unfolding .sk-name{transition:none}
 
   /* The bubble: thin bright neon rim, soft outer bloom, rim flares, dark glass */
   .scroll-knob .sk-thumb{
@@ -180,12 +214,16 @@
   .scroll-knob[data-bubble="c"] .sk-thumb .sk-flare-a{width:28%;height:18%;opacity:.9}
   .scroll-knob[data-bubble="c"] .sk-thumb .sk-flare-b{width:12%;height:12%;opacity:.85}
   .scroll-knob[data-bubble="d"] .sk-thumb .sk-flare{opacity:.35}
-  .scroll-knob.is-held .sk-thumb .sk-flare-a,.scroll-knob.is-menu .sk-thumb .sk-flare-a{width:26%;height:18%;opacity:.85}
-  .scroll-knob.is-held .sk-thumb .sk-flare-b,.scroll-knob.is-menu .sk-thumb .sk-flare-b{width:11%;height:11%;opacity:.75}
+  .scroll-knob.is-held .sk-thumb .sk-flare-a,.scroll-knob.is-menu .sk-thumb .sk-flare-a,.scroll-knob.is-folding .sk-thumb .sk-flare-a,.scroll-knob.is-unfolding .sk-thumb .sk-flare-a{width:26%;height:18%;opacity:.85}
+  .scroll-knob.is-held .sk-thumb .sk-flare-b,.scroll-knob.is-menu .sk-thumb .sk-flare-b,.scroll-knob.is-folding .sk-thumb .sk-flare-b,.scroll-knob.is-unfolding .sk-thumb .sk-flare-b{width:11%;height:11%;opacity:.75}
   .scroll-knob[data-bubble="d"].is-held .sk-thumb .sk-flare-a,
-  .scroll-knob[data-bubble="d"].is-menu .sk-thumb .sk-flare-a{opacity:.5}
+  .scroll-knob[data-bubble="d"].is-menu .sk-thumb .sk-flare-a,
+  .scroll-knob[data-bubble="d"].is-folding .sk-thumb .sk-flare-a,
+  .scroll-knob[data-bubble="d"].is-unfolding .sk-thumb .sk-flare-a{opacity:.5}
   .scroll-knob.is-held .sk-thumb,
-  .scroll-knob.is-menu .sk-thumb{
+  .scroll-knob.is-menu .sk-thumb,
+  .scroll-knob.is-folding .sk-thumb,
+  .scroll-knob.is-unfolding .sk-thumb{
     width:52px;height:52px;margin-top:-26px;right:.2rem;cursor:grabbing;
     box-shadow:
       0 0 0 var(--sk-rim-w) rgba(var(--sk-rim),.95),
@@ -215,10 +253,44 @@
   .sk-variants button[data-bubble="c"]{background:radial-gradient(circle at 35% 30%,#fff,rgb(40,150,255) 45%,rgb(10,70,200))}
   .sk-variants button[data-bubble="d"]{background:radial-gradient(circle at 35% 30%,#cfe4ff,rgb(40,110,220) 55%,rgb(8,40,120))}
   .sk-variants button.is-on{box-shadow:0 0 0 2px #fff, 0 0 10px rgba(140,210,255,.8)}
+
+  /* First-visit hint: slow breath on the bubble, small glow tip to its left. */
+  .scroll-knob .sk-hint{
+    position:absolute;top:0;right:2.5rem;margin-top:-.95rem;
+    height:1.9rem;display:flex;align-items:center;
+    padding:.18rem .7rem .18rem 1.1rem;border-radius:999px;
+    font-size:.74rem;font-weight:650;letter-spacing:.01em;white-space:nowrap;
+    color:#f2f7ff;pointer-events:none;opacity:0;z-index:5;
+    background:
+      linear-gradient(to left, rgba(var(--sk-core),.18), rgba(var(--sk-core),.10)),
+      linear-gradient(to left, rgba(8,18,36,.72), rgba(8,18,36,.5));
+    text-shadow:0 1px 2px rgba(0,0,0,.75), 0 0 10px rgba(var(--sk-core),.7);
+    box-shadow:0 0 12px rgba(var(--sk-core),.28);
+    -webkit-mask-image:linear-gradient(to right, transparent 0, #000 .95rem, #000 100%);
+            mask-image:linear-gradient(to right, transparent 0, #000 .95rem, #000 100%);
+  }
+  .scroll-knob.is-hint .sk-hint{opacity:1;transition:opacity .45s ease}
+  .scroll-knob.is-hint-out .sk-hint{opacity:0;transition:opacity 1.3s ease}
+  .scroll-knob.is-hint .sk-thumb::after{
+    content:"";position:absolute;inset:-5px;border-radius:inherit;pointer-events:none;
+    box-shadow:0 0 16px 6px rgba(var(--sk-core),.5), 0 0 28px 10px rgba(var(--sk-deep),.28);
+    animation:sk-breathe 2.8s ease-in-out infinite;
+  }
+  .scroll-knob.is-hint-out .sk-thumb::after{
+    content:"";position:absolute;inset:-5px;border-radius:inherit;pointer-events:none;
+    box-shadow:0 0 16px 6px rgba(var(--sk-core),.5);
+    animation:none;opacity:0;transition:opacity 1.3s ease;
+  }
+}
+
+@keyframes sk-breathe{
+  0%,100%{opacity:.42;transform:scale(.94)}
+  50%{opacity:1;transform:scale(1.08)}
 }
 
 html.sk-scrubbing{scroll-behavior:auto!important}
 
 @media (max-width:900px) and (prefers-reduced-motion:reduce){
-  .scroll-knob .sk-icon,.scroll-knob .sk-name,.scroll-knob .sk-thumb,.scroll-knob .sk-wash{transition:none}
+  .scroll-knob .sk-icon,.scroll-knob .sk-name,.scroll-knob .sk-thumb,.scroll-knob .sk-wash,.scroll-knob .sk-hint{transition:none!important;transition-delay:0s!important}
+  .scroll-knob.is-hint .sk-thumb::after,.scroll-knob.is-hint-out .sk-thumb::after{animation:none}
 }

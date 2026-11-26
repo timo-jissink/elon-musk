@@ -93,10 +93,12 @@
       <span class="sk-flare sk-flare-a" aria-hidden="true"></span>
       <span class="sk-flare sk-flare-b" aria-hidden="true"></span>
       <span class="sk-flare sk-flare-c" aria-hidden="true"></span>
-    </button>`;
+    </button>
+    <div class="sk-hint" hidden aria-hidden="true"></div>`;
   document.body.append(root);
   const rail = root.querySelector('.sk-rail');
   const thumb = root.querySelector('.sk-thumb');
+  const hintEl = root.querySelector('.sk-hint');
 
   const titleOf = sec => {
     const a = document.querySelector('.sidenav a[href="#' + sec.id + '"], .navmenu a[href="#' + sec.id + '"]');
@@ -130,6 +132,7 @@
   let padTop = 0, padBot = 0, track = 1, docH = 1, viewH = 1, maxY = 1;
   const docEl = document.documentElement;
   let pendingY = null, scrubRaf = 0;
+  let dismissHint = () => {};
   let holding = false, menuOpen = false, holdTimer = 0, foldTimer = 0, moved = false, startY = 0, startX = 0;
 
   // Icons on the hold rail follow a circular/cosine arc around the bubble, then return to the right edge.
@@ -184,7 +187,11 @@
   };
 
   const progress = () => Math.min(1, Math.max(0, scrollY / maxY));
-  const placeThumb = p => { thumb.style.transform = `translate3d(0,${(padTop + p * track).toFixed(1)}px,0)`; };
+  const placeThumb = p => {
+    const y = `translate3d(0,${(padTop + p * track).toFixed(1)}px,0)`;
+    thumb.style.transform = y;
+    hintEl.style.transform = y;
+  };
   const currentAt = p => {
     let cur = railIcons[0] || icons[0];
     for (const it of railIcons) if (p + 0.012 >= it.t) cur = it;
@@ -221,6 +228,7 @@
   };
 
   const setHeld = on => {
+    if (on) dismissHint();
     holding = on;
     docEl.classList.toggle('sk-scrubbing', on);
     if (on) { closeMenu(true); measure(); rail.hidden = false; }
@@ -234,51 +242,120 @@
     if (on) paint(progress());
   };
 
+  const FOLD_MS = 340;
+  const rowStagger = (it, thumbY) => Math.round(Math.abs((it.listY ?? it.y) - thumbY) / 34) * 14;
+  const clearFoldStyles = () => {
+    icons.forEach(it => {
+      const st = it.el.style;
+      st.transition = ''; st.transitionDelay = ''; st.willChange = '';
+      st.transform = ''; st.opacity = ''; st.visibility = ''; st.pointerEvents = '';
+    });
+  };
+
   const openMenu = () => {
     if (holding) return;
+    dismissHint();
     clearTimeout(foldTimer);
     measure();
     const p = progress();
     const thumbY = padTop + p * track;
     rail.hidden = false;
-    icons.forEach(it => {
-      it.el.style.transition = 'none';
-      it.el.style.transform = '';
-      it.el.style.top = thumbY + 'px';
-    });
     layoutList(p);
     menuOpen = true;
-    root.classList.add('is-menu');
+    root.classList.add('is-menu', 'is-unfolding');
     root.classList.remove('is-folding');
     thumb.setAttribute('aria-expanded', 'true');
     paint(p);
+    let maxDelay = 0;
+    icons.forEach(it => {
+      const delay = rowStagger(it, thumbY);
+      if (delay > maxDelay) maxDelay = delay;
+      const st = it.el.style;
+      st.visibility = '';
+      st.pointerEvents = 'none';
+      st.willChange = 'transform, opacity';
+      st.transition = 'none';
+      st.transitionDelay = '0s';
+      st.top = it.listY + 'px';
+      st.transform = `translate3d(0, ${(thumbY - it.listY).toFixed(1)}px, 0)`;
+      st.opacity = '0';
+      it._delay = delay;
+    });
     requestAnimationFrame(() => {
-      icons.forEach(it => {
-        it.el.style.transition = '';
-        it.el.style.top = it.listY + 'px';
+      requestAnimationFrame(() => {
+        if (!menuOpen) return;
+        icons.forEach(it => {
+          const st = it.el.style;
+          st.transition = `transform ${FOLD_MS}ms ease, opacity ${Math.round(FOLD_MS * 0.85)}ms ease`;
+          st.transitionDelay = it._delay + 'ms';
+          st.transform = 'translate3d(0,0,0)';
+          st.opacity = '';
+        });
       });
     });
+    foldTimer = setTimeout(() => {
+      if (!menuOpen) return;
+      root.classList.remove('is-unfolding');
+      icons.forEach(it => {
+        const st = it.el.style;
+        st.transition = ''; st.transitionDelay = ''; st.willChange = '';
+        st.transform = ''; st.pointerEvents = '';
+      });
+    }, FOLD_MS + maxDelay + 40);
   };
 
   const closeMenu = instant => {
-    if (!menuOpen) { root.classList.remove('is-menu'); return; }
+    if (!menuOpen && !root.classList.contains('is-unfolding') && !root.classList.contains('is-folding')) {
+      root.classList.remove('is-menu');
+      return;
+    }
     menuOpen = false;
     thumb.setAttribute('aria-expanded', 'false');
     const thumbY = padTop + progress() * track;
     if (instant || reduce) {
-      root.classList.remove('is-menu', 'is-folding');
+      root.classList.remove('is-menu', 'is-folding', 'is-unfolding');
+      clearFoldStyles();
       if (!holding) rail.hidden = true;
       measure();
       return;
     }
+    clearTimeout(foldTimer);
     root.classList.add('is-folding');
-    root.classList.remove('is-menu');
-    icons.forEach(it => { it.el.style.top = thumbY + 'px'; });
+    let maxDelay = 0;
+    icons.forEach(it => {
+      const delay = rowStagger(it, thumbY);
+      if (delay > maxDelay) maxDelay = delay;
+      it._delay = delay;
+      const st = it.el.style;
+      st.willChange = 'transform, opacity';
+      st.pointerEvents = 'none';
+      st.transition = 'none';
+      st.transitionDelay = '0s';
+      st.top = (it.listY ?? it.y) + 'px';
+      st.transform = 'translate3d(0,0,0)';
+      st.opacity = '0.92';
+    });
+    root.classList.remove('is-menu', 'is-unfolding');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (menuOpen || !root.classList.contains('is-folding')) return;
+        icons.forEach(it => {
+          const st = it.el.style;
+          const y = it.listY ?? it.y;
+          st.transition = `transform ${FOLD_MS}ms ease, opacity ${Math.round(FOLD_MS * 0.75)}ms ease`;
+          st.transitionDelay = it._delay + 'ms';
+          st.transform = `translate3d(0, ${(thumbY - y).toFixed(1)}px, 0)`;
+          st.opacity = '0';
+        });
+      });
+    });
     foldTimer = setTimeout(() => {
       root.classList.remove('is-folding');
+      icons.forEach(it => { it.el.style.visibility = 'hidden'; it.el.style.pointerEvents = 'none'; });
       if (!holding && !menuOpen) rail.hidden = true;
+      clearFoldStyles();
       measure();
-    }, 280);
+    }, FOLD_MS + maxDelay + 80);
   };
 
   const yToProgress = clientY => Math.min(1, Math.max(0, (clientY - padTop) / track));
@@ -341,6 +418,31 @@
   addEventListener('resize', () => { measure(); if (menuOpen) layoutList(progress()); paint(progress()); }, { passive: true });
   addEventListener('load', () => { measure(); paint(progress()); });
   measure(); paint(progress());
+
+  // First-visit hint: a slow breath on the bubble plus a small tip. Shown once, then
+  // remembered in localStorage. Fades out after a hold, or after 4s of no use.
+  const HINT_KEY = 'sk-bubble-hint';
+  const hintSeen = () => { try { return localStorage.getItem(HINT_KEY) === '1'; } catch { return false; } };
+  const hintMark = () => { try { localStorage.setItem(HINT_KEY, '1'); } catch {} };
+  let hintTimer = 0;
+  dismissHint = () => {
+    if (!root.classList.contains('is-hint')) return;
+    clearTimeout(hintTimer);
+    hintMark();
+    root.classList.remove('is-hint');
+    root.classList.add('is-hint-out');
+    setTimeout(() => {
+      root.classList.remove('is-hint-out');
+      hintEl.hidden = true;
+    }, 1500);
+  };
+  if (!hintSeen()) {
+    const nl = (document.documentElement.lang || '').toLowerCase().startsWith('nl') || /\/nl(\/|$)/.test(location.pathname);
+    hintEl.textContent = nl ? 'Vasthouden om te scrollen · tik voor secties' : 'Hold to scrub · tap for sections';
+    hintEl.hidden = false;
+    root.classList.add('is-hint');
+    hintTimer = setTimeout(dismissHint, 4000);
+  }
 
   // Preview: four mid-blue neon options, ?bubble=a|b|c|d, default a (closest to the mid glow).
   if (document.querySelector('.preview-flag')) {
