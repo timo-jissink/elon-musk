@@ -128,6 +128,8 @@
   };
 
   let padTop = 0, padBot = 0, track = 1, docH = 1, viewH = 1, maxY = 1;
+  const docEl = document.documentElement;
+  let pendingY = null, scrubRaf = 0;
   let holding = false, menuOpen = false, holdTimer = 0, foldTimer = 0, moved = false, startY = 0, startX = 0;
 
   // Icons on the hold rail follow a circular/cosine arc around the bubble, then return to the right edge.
@@ -182,7 +184,7 @@
   };
 
   const progress = () => Math.min(1, Math.max(0, scrollY / maxY));
-  const placeThumb = p => { thumb.style.top = (padTop + p * track) + 'px'; };
+  const placeThumb = p => { thumb.style.transform = `translate3d(0,${(padTop + p * track).toFixed(1)}px,0)`; };
   const currentAt = p => {
     let cur = railIcons[0] || icons[0];
     for (const it of railIcons) if (p + 0.012 >= it.t) cur = it;
@@ -195,30 +197,37 @@
     const thumbY = padTop + p * track;
     icons.forEach(it => {
       if (menuOpen) {
-        it.el.style.transform = '';
-        it.el.style.setProperty('--sk-arc', '0px');
+        if (it.arc) { it.el.style.setProperty('--sk-arc', '0px'); it.arc = 0; }
         it.el.classList.toggle('is-current', it === cur || it.sec.id === cur.sec.id);
         it.el.classList.remove('is-arc');
         return;
       }
       if (!it.rail) return;
-      const dy = it.y - thumbY;
-      const o = holding ? arcOffset(dy) : 0;
-      it.el.style.transform = '';
-      it.el.style.setProperty('--sk-arc', o ? `${-o}px` : '0px');
-      it.el.classList.toggle('is-arc', o > ARC_X * 0.2);
+      const o = holding ? arcOffset(it.y - thumbY) : 0;
+      const r = Math.round(o * 10) / 10;
+      if (r !== it.arc) {                       // write only when the offset changed
+        it.arc = r;
+        it.el.style.setProperty('--sk-arc', r ? `${-r}px` : '0px');
+        it.el.classList.toggle('is-arc', r > ARC_X * 0.2);
+      }
       it.el.classList.toggle('is-current', it === cur);
     });
   };
 
-  const onScroll = () => { if (!holding) paint(progress()); };
+  let scrollRaf = 0;
+  const onScroll = () => {
+    if (holding || scrollRaf) return;
+    scrollRaf = requestAnimationFrame(() => { scrollRaf = 0; if (!holding) paint(progress()); });
+  };
 
   const setHeld = on => {
     holding = on;
+    docEl.classList.toggle('sk-scrubbing', on);
     if (on) { closeMenu(true); measure(); rail.hidden = false; }
+    else { pendingY = null; }
     root.classList.toggle('is-held', on);
     if (!on && !menuOpen) {
-      railIcons.forEach(it => { it.el.style.transform = ''; it.el.style.setProperty('--sk-arc', '0px'); it.el.classList.remove('is-arc'); });
+      railIcons.forEach(it => { it.arc = 0; it.el.style.setProperty('--sk-arc', '0px'); it.el.classList.remove('is-arc'); });
       rail.hidden = true;
     }
     thumb.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -273,15 +282,24 @@
   };
 
   const yToProgress = clientY => Math.min(1, Math.max(0, (clientY - padTop) / track));
-  const scrub = clientY => {
-    const p = yToProgress(clientY);
-    scrollTo({ top: p * maxY, behavior: 'auto' });
+  // Immediate scrub: the latest pointer Y is applied once per frame with an instant jump.
+  // (scrollTo behavior:'auto' defers to html{scroll-behavior:smooth}, which eased every move.)
+  const flushScrub = () => {
+    scrubRaf = 0;
+    if (pendingY === null || !holding) return;
+    const p = yToProgress(pendingY);
+    scrollTo({ top: p * maxY, behavior: 'instant' });
     paint(p);
+  };
+  const scrub = clientY => {
+    pendingY = clientY;
+    if (!scrubRaf) scrubRaf = requestAnimationFrame(flushScrub);
   };
 
   const release = ev => {
     clearTimeout(holdTimer); holdTimer = 0;
     const wasHeld = holding;
+    if (holding && pendingY !== null) flushScrub();
     if (holding) setHeld(false);
     if (!wasHeld && !moved) {
       if (menuOpen) closeMenu(); else openMenu();
