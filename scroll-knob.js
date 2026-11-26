@@ -1,12 +1,6 @@
 // Mobile scroll knob: neon-glass bubble on the right that tracks scroll.
 // The same icons form the rail (hold to scrub along an arc) and unfold into the section list (tap).
 (() => {
-  const mq = matchMedia('(max-width:900px)');
-  if (!mq.matches) return;
-
-  const sections = [...document.querySelectorAll('main section[id]')];
-  if (!sections.length) return;
-
   // Company logos: Simple Icons (CC0) where available; otherwise the official mark
   // (see comments). Simple Icons: Tesla, SpaceX, X, OpenAI, PayPal.
   const SI = {
@@ -17,23 +11,21 @@
     paypal: `M15.607 4.653H8.941L6.645 19.251H1.82L4.862 0h7.995c3.754 0 6.375 2.294 6.473 5.513-.648-.478-2.105-.86-3.722-.86m6.57 5.546c0 3.41-3.01 6.853-6.958 6.853h-2.493L11.595 24H6.74l1.845-11.538h3.592c4.208 0 7.346-3.634 7.153-6.949a5.24 5.24 0 0 1 2.848 4.686M9.653 5.546h6.408c.907 0 1.942.222 2.363.541-.195 2.741-2.655 5.483-6.441 5.483H8.714Z`
   };
   const p = d => `<path d="${d}"/>`;
+  const opt = (svg, s) => s===1 ? svg : `<g transform="translate(12,12) scale(${s}) translate(-12,-12)">${svg}</g>`;
   const LOGOS = {
     tesla: p(SI.tesla),
     // SpaceX SI mark, scaled/centered; swoosh tail is allowed to peek past the circle.
-    spacex: `<g class="sk-spacex" transform="translate(12,12.2) scale(1.22) translate(-12,-13)">${p(SI.spacex)}</g>`,
-    // Official Starlink 2024 Hohmann-transfer mark (same geometry as
-    // Wikimedia File:Starlink Logo 2024.svg / starlink.com): two concentric
-    // orbits, a downward-shifted transfer orbit, Sun + two planets.
-    // Strokes and dots are thickened for rail / menu-pill size; the official
-    // hairlines would vanish at 16px. PD-textlogo / PD-shape; trademark of
-    // Starlink Services, LLC / SpaceX. Wordmark omitted (illegible at 16px).
-    starlink: `<g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="11.7" r="9.05"/>
-      <circle cx="12" cy="11.7" r="5.15"/>
-      <circle cx="12" cy="13.55" r="7.15"/>
-      <circle cx="12" cy="11.7" r="1.55" fill="currentColor" stroke="none"/>
-      <circle cx="12" cy="6.55" r="1.35" fill="currentColor" stroke="none"/>
-      <circle cx="12" cy="20.75" r="1.2" fill="currentColor" stroke="none"/>
+    spacex: `<g class="sk-spacex" transform="translate(16.4,12.2) scale(1.22) translate(-12,-13)">${p(SI.spacex)}</g>`,
+    // Official Starlink 2024 Hohmann-transfer geometry (Wikimedia File:Starlink Logo 2024.svg).
+    // Site uses variant B: same shape, medium stroke, enlarged dots (official hairlines
+    // and official-size dots vanish at 16px). See preview/starlink-compare.png for A vs B.
+    starlink: `<g transform="translate(12,12) scale(0.348) translate(-103.19,-49)" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M 133.52588,49.312842 A 30.33927,30.612972 0 0 1 102.7941,79.388922 30.33927,30.612972 0 0 1 72.853116,48.511427 30.33927,30.612972 0 0 1 103.32361,18.165891 30.33927,30.612972 0 0 1 133.5305,48.778572"/>
+      <path d="M 129.16394,54.807626 A 25.98844,25.033722 0 0 1 102.83928,79.402305 25.98844,25.033722 0 0 1 77.192009,54.15227 25.98844,25.033722 0 0 1 103.29285,29.337244 25.98844,25.033722 0 0 1 129.1679,54.370728"/>
+      <path d="M 122.97742,49.383246 A 19.801708,19.721062 0 0 1 102.91953,68.758438 19.801708,19.721062 0 0 1 83.377772,48.86697 19.801708,19.721062 0 0 1 103.26513,29.318192 a 19.801708,19.721062 0 0 1 19.7153,19.720874"/>
+      <circle cx="103.19055" cy="29.241154" r="4.5" fill="currentColor" stroke="none"/>
+      <circle cx="103.20589" cy="49.074612" r="5.3" fill="currentColor" stroke="none"/>
+      <circle cx="103.17043" cy="79.370766" r="4.1" fill="currentColor" stroke="none"/>
     </g>`,
     x: p(SI.x),
     openai: p(SI.openai),
@@ -43,32 +35,32 @@
     // Official Neuralink symbol from the neuralink.com header (26 Nov 2026).
     // Trademark of Neuralink Corp. Older Wikimedia wordmark is PD-textlogo but
     // unreadable at this size, so the official compact emblem is used instead.
-    neuralink: `<g transform="translate(1.6,5.5) scale(0.3714)"><path fill="currentColor" fill-rule="evenodd" d="M30.8777 22.4886H0.705078L22.5011 2.28693C24.3585 0.565492 27.0293 -0.000275522 29.47 0.809903C31.9102 1.62058 33.6439 3.6498 33.994 6.10498L37.476 30.5019C37.5803 31.2306 38.0767 31.8049 38.8036 32.0367C39.5305 32.2696 40.2868 32.0946 40.8255 31.572L50.1712 22.4886H39.4676L39.1096 20.2688H55.7051L42.4717 33.131C41.6499 33.9302 40.5593 34.3566 39.4367 34.3566C38.9823 34.3566 38.5221 34.2862 38.073 34.1429C36.5143 33.6455 35.4074 32.3656 35.1842 30.8031L31.7021 6.40672C31.4673 4.75921 30.3499 3.45166 28.7127 2.90802C27.0759 2.36337 25.3548 2.72899 24.108 3.88365L6.42923 20.2688H30.5522L30.8777 22.4886Z"/></g>`,
+    neuralink: `<g transform="translate(0.6,4.88) scale(0.4071)"><path fill="currentColor" fill-rule="evenodd" d="M30.8777 22.4886H0.705078L22.5011 2.28693C24.3585 0.565492 27.0293 -0.000275522 29.47 0.809903C31.9102 1.62058 33.6439 3.6498 33.994 6.10498L37.476 30.5019C37.5803 31.2306 38.0767 31.8049 38.8036 32.0367C39.5305 32.2696 40.2868 32.0946 40.8255 31.572L50.1712 22.4886H39.4676L39.1096 20.2688H55.7051L42.4717 33.131C41.6499 33.9302 40.5593 34.3566 39.4367 34.3566C38.9823 34.3566 38.5221 34.2862 38.073 34.1429C36.5143 33.6455 35.4074 32.3656 35.1842 30.8031L31.7021 6.40672C31.4673 4.75921 30.3499 3.45166 28.7127 2.90802C27.0759 2.36337 25.3548 2.72899 24.108 3.88365L6.42923 20.2688H30.5522L30.8777 22.4886Z"/></g>`,
     // The Boring Company wordmark vanishes at this size; tunnel portal mark instead.
-    boring: `<path d="M4 20V11.2A8 8 0 0 1 20 11.2V20" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round"/><path d="M8 20V12.1a4 4 0 0 1 8 0V20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/><path d="M4 20h16" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>`,
+    boring: opt(`<path d="M4 20V11.2A8 8 0 0 1 20 11.2V20" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round"/><path d="M8 20V12.1a4 4 0 0 1 8 0V20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/><path d="M4 20h16" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>`, 1.09),
     // Official xAI mark. Source: Wikimedia Commons File:XAI-Logo.svg (from x.ai).
     // PD-textlogo / simple geometry; trademark of xAI (X.AI Corp.).
     xai: `<g fill="currentColor"><polygon points="0.12 182.71 234.14 516.92 338.15 516.92 104.13 182.71 0.12 182.71"/><polygon points="0 516.92 104.08 516.92 156.08 442.67 104.04 368.34 0 516.92"/><polygon points="466.04 0 361.96 0 182.1 256.86 234.15 331.18 466.04 0"/><polygon points="380.78 516.92 466.04 516.92 466.04 37.16 380.78 158.92 380.78 516.92"/></g>`,
-    //     // DOGE (Department of Government Efficiency): shield with a D. Not on a rail slot (no DOGE section).
+    // DOGE (Department of Government Efficiency): shield with a D. Not on a rail slot (no DOGE section).
     doge: `<path d="M12 2.2l7.2 3v7.3c0 4.4-3 7.6-7.2 9.5-4.2-1.9-7.2-5.1-7.2-9.5V5.2L12 2.2z"/><path d="M10 8.1h2.4c2.15 0 3.5 1.35 3.5 3.4s-1.35 3.4-3.5 3.4H10V8.1zm1.55 1.45v3.9h.85c1.2 0 1.9-.7 1.9-1.95s-.7-1.95-1.9-1.95h-.85z" fill="#0b1220"/>`
   };
   // Generic monochrome marks for remaining sections (not company sub-topics).
   const GENERIC = {
-    summary: p("M12 3.2 14.2 9h6.3l-5.1 3.8 1.9 6.2L12 15.6 6.7 19l1.9-6.2L3.5 9h6.3z"),
-    contested: `<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v5M12 16.5h.01" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`,
+    summary: opt(p("M12 3.2 14.2 9h6.3l-5.1 3.8 1.9 6.2L12 15.6 6.7 19l1.9-6.2L3.5 9h6.3z"), 1.20),
+    contested: opt(`<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v5M12 16.5h.01" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`, 1.15),
     speech: LOGOS.x,
-    style: `<circle cx="7.5" cy="8" r="3.35"/><circle cx="16.5" cy="8" r="3.35"/><path d="M3 19c1.3-3.4 3.5-5 4.5-5s3.2 1.6 4.5 5M12 19c1.3-3.4 3.5-5 4.5-5s3.2 1.6 4.5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`,
-    timelines: `<rect x="4" y="5" width="16" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 3v4M16 3v4M4 10h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`,
-    lawsuits: `<g fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.6v13.6M7.2 20.4h9.6"/><path d="M12 4.6 4.4 8.4h15.2z" /><path d="M5.4 8.4 3.4 13.4c0 .15 1.9 1.35 3.6 1.35s3.6-1.2 3.6-1.35L8.6 8.4"/><path d="M15.4 8.4 13.4 13.4c0 .15 1.9 1.35 3.6 1.35s3.6-1.2 3.6-1.35L18.6 8.4"/></g>`,
-    criticism: `<g fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 9h4.2l9.2-4.8v15.6L8 15H3.8z"/><path d="M8.2 15.2v3.4l-2.8 1.2"/><path d="M19.2 10c1.15.7 1.15 3.3 0 4"/></g>`,
-    scorecard: `<path d="M5 12l4 4 10-10M4 19h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>`,
-    human: `<circle cx="10.2" cy="7.6" r="3.15"/><path d="M4.4 19.4c0-3.5 2.6-5.7 5.8-5.7s5.8 2.2 5.8 5.7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M16.35 8.15c0-1.2 1.05-1.9 1.95-1.15.9-.75 1.95-.05 1.95 1.15 0 1.4-1.95 2.7-1.95 2.7s-1.95-1.3-1.95-2.7z" fill="currentColor"/>`,
+    style: opt(`<circle cx="7.5" cy="8" r="3.35"/><circle cx="16.5" cy="8" r="3.35"/><path d="M3 19c1.3-3.4 3.5-5 4.5-5s3.2 1.6 4.5 5M12 19c1.3-3.4 3.5-5 4.5-5s3.2 1.6 4.5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`, 1.04),
+    timelines: opt(`<rect x="4" y="5" width="16" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 3v4M16 3v4M4 10h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`, 1.09),
+    lawsuits: opt(`<g fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.6v13.6M7.2 20.4h9.6"/><path d="M12 4.6 4.4 8.4h15.2z" /><path d="M5.4 8.4 3.4 13.4c0 .15 1.9 1.35 3.6 1.35s3.6-1.2 3.6-1.35L8.6 8.4"/><path d="M15.4 8.4 13.4 13.4c0 .15 1.9 1.35 3.6 1.35s3.6-1.2 3.6-1.35L18.6 8.4"/></g>`, 1.08),
+    criticism: opt(`<g fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 9h4.2l9.2-4.8v15.6L8 15H3.8z"/><path d="M8.2 15.2v3.4l-2.8 1.2"/><path d="M19.2 10c1.15.7 1.15 3.3 0 4"/></g>`, 1.14),
+    scorecard: opt(`<path d="M5 12l4 4 10-10M4 19h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>`, 1.15),
+    human: opt(`<circle cx="9.3" cy="7.8" r="3.2"/><path d="M3.5 19.8c0-3.6 2.6-5.8 5.8-5.8s5.8 2.2 5.8 5.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M15.05 9.55c0-2.05 1.75-3.25 3.25-1.95 1.5-1.3 3.25-.15 3.25 1.95 0 2.35-3.25 4.55-3.25 4.55s-3.25-2.2-3.25-4.55z" fill="currentColor"/>`, 1.08),
     note: `<g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M8.6 14.2c-2.1 0-3.8-1.6-3.8-3.6 0-1.6 1.1-3 2.6-3.5.5-2.1 2.4-3.5 4.6-3.5 1.6 0 3 .7 3.9 1.9 1.2-.8 2.9-.6 3.9.7 1.1.4 1.9 1.6 1.9 2.9 0 1.8-1.4 3.3-3.1 3.5-.3 1.6-1.8 2.8-3.6 2.8-1.1 0-2.1-.5-2.8-1.2-.7.6-1.6.9-2.6.9z"/><circle cx="6.7" cy="16.8" r="1.5"/><circle cx="4.3" cy="20.15" r=".9"/></g>`,
-    sources: `<path d="M7 4h8a2 2 0 0 1 2 2v14l-6-2-6 2V6a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`,
-    credits: `<rect x="4" y="6" width="16" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="11" r="1.6"/><path d="M4 16l4.5-3.5L13 16l3-2.5 4 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>`
+    sources: opt(`<path d="M7 4h8a2 2 0 0 1 2 2v14l-6-2-6 2V6a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`, 1.16),
+    credits: opt(`<rect x="4" y="6" width="16" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="11" r="1.6"/><path d="M4 16l4.5-3.5L13 16l3-2.5 4 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>`, 1.16)
   };
   // OpenAI + xAI share one section: both marks, side by side.
-  LOGOS.openai_xai = `<g transform="translate(0.7,6.2) scale(0.4833)">${LOGOS.openai}</g><g transform="translate(12.7,6.2) scale(0.02244)">${LOGOS.xai}</g>`;
+  LOGOS.openai_xai = `<g transform="translate(0.05,5.2) scale(0.55)">${LOGOS.openai}</g><g transform="translate(13.15,5.2) scale(0.02553)">${LOGOS.xai}</g>`;
 
   const BY_ID = {
     'tesla-and-the-ev-push': LOGOS.tesla,
@@ -94,6 +86,29 @@
     'image-credits': GENERIC.credits
   };
   const FALLBACK = `<circle cx="12" cy="12" r="3"/>`;
+  const svgFor = id => '<svg class="sk-logo' + (id==='spacex' ? ' is-spacex' : '') + '" viewBox="0 0 24 24" overflow="visible" aria-hidden="true">' + (BY_ID[id] || FALLBACK) + '</svg>';
+
+  // Desktop (>=901px): icons + glow pill on the "On this page" list. No scroll knob.
+  const decorateSidenav = () => {
+    const nav = document.querySelector('.sidenav');
+    if (!nav) return;
+    nav.classList.add('sk-side');
+    nav.querySelectorAll('a[href^="#"]').forEach(a => {
+      const id = decodeURIComponent((a.getAttribute('href') || '').slice(1));
+      if (!id || a.querySelector('.sk-logo')) return;
+      a.insertAdjacentHTML('afterbegin', svgFor(id));
+      const label = document.createElement('span');
+      label.className = 'sk-slabel';
+      while (a.childNodes.length > 1) label.appendChild(a.childNodes[1]);
+      a.appendChild(label);
+    });
+  };
+  const mq = matchMedia('(max-width:900px)');
+  if (!mq.matches) { decorateSidenav(); return; }
+
+  const sections = [...document.querySelectorAll('main section[id]')];
+  if (!sections.length) return;
+
   // Hold rail omits Starlink in Ukraine (and would omit any Tesla sub-topic).
   const LIST_ONLY = new Set(['starlink-in-ukraine']);
 
@@ -120,8 +135,6 @@
     const a = document.querySelector('.sidenav a[href="#' + sec.id + '"], .navmenu a[href="#' + sec.id + '"]');
     return ((a && a.textContent) || (sec.querySelector('h2') || {}).textContent || sec.id).trim();
   };
-  const svgFor = id => '<svg class="sk-logo' + (id==='spacex' ? ' is-spacex' : '') + '" viewBox="0 0 24 24" overflow="visible" aria-hidden="true">' + (BY_ID[id] || FALLBACK) + '</svg>';
-
   const icons = sections.map(sec => {
     const a = document.createElement('a');
     a.className = 'sk-icon' + (LIST_ONLY.has(sec.id) ? ' is-list-only' : '');

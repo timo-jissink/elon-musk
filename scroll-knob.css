@@ -1,4 +1,5 @@
-/* Mobile-only scroll knob. Hidden on desktop (min-width 901px).
+/* Mobile scroll knob (hidden on desktop). Desktop sidenav reuses the same icons
+   and the soft glow pill for the current section — no knob on desktop.
    One visual language: neon-blue rim, soft outer glow, dark glass, frames that fade to the left.
    The tap list is the same icon rail unfolding, not a separate popup.
    Bubble options a|b|c|d all lean to the mid-blue neon glow; a is the default (closest). */
@@ -295,4 +296,42 @@ html.sk-scrubbing{scroll-behavior:auto!important}
 @media (max-width:900px) and (prefers-reduced-motion:reduce){
   .scroll-knob .sk-icon,.scroll-knob .sk-name,.scroll-knob .sk-thumb,.scroll-knob .sk-wash,.scroll-knob .sk-hint{transition:none!important;transition-delay:0s!important}
   .scroll-knob.is-hint .sk-thumb::after,.scroll-knob.is-hint-out .sk-thumb::after{animation:none}
+}
+
+/* Desktop: "On this page" list — same icons, glow pill on the scroll-spy current item. */
+@media (min-width:901px){
+  .sidenav.sk-side{
+    --sk-rim:170,220,255;
+    --sk-core:50,150,255;
+    --sk-deep:20,80,200;
+  }
+  .sidenav.sk-side ol{border-left:0;padding:0}
+  .sidenav.sk-side a{
+    display:flex;align-items:flex-start;gap:.45rem;
+    padding:.32rem .6rem .32rem .4rem;margin-left:0;
+    border-left:0;border-radius:999px;
+    color:var(--muted);position:relative;
+  }
+  .sidenav.sk-side a .sk-logo{
+    width:15px;height:15px;flex:0 0 15px;margin-top:.18rem;
+    fill:currentColor;overflow:visible;display:block;
+  }
+  .sidenav.sk-side a .sk-logo.is-spacex{width:20px;height:20px;margin:.05rem -.15rem 0 .05rem}
+  .sidenav.sk-side a .sk-logo [fill="none"]{fill:none}
+  .sidenav.sk-side a .sk-slabel{flex:1;min-width:0}
+  .sidenav.sk-side a:hover{color:var(--text);background:rgba(50,150,255,.06)}
+  .sidenav.sk-side a.active{
+    color:#e8f2ff;border-left-color:transparent;
+    background:
+      linear-gradient(to right, rgba(var(--sk-core),.18), rgba(var(--sk-core),.08) 58%, transparent 100%),
+      linear-gradient(to right, rgba(8,18,36,.58), rgba(8,18,36,.22) 72%, transparent 100%);
+    box-shadow:0 0 12px rgba(var(--sk-core),.25);
+    text-shadow:0 0 10px rgba(var(--sk-core),.45);
+  }
+  .sidenav.sk-side a.active::after{
+    content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    border:1.2px solid rgba(var(--sk-rim),.75);
+    -webkit-mask-image:linear-gradient(to right, #000 14%, rgba(0,0,0,.5) 58%, transparent 100%);
+            mask-image:linear-gradient(to right, #000 14%, rgba(0,0,0,.5) 58%, transparent 100%);
+  }
 }
