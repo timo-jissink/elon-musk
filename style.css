@@ -402,3 +402,7 @@ table.calc-mini tr.calc-total th,table.calc-mini tr.calc-total td{font-weight:70
 .row-fold > p{margin:.5rem 0 0}
 .row-fold[open] > summary::after{content:none}
 .two-col > .callout:has(> .calc-fold:not([open])){align-self:start}
+
+/* attention chart: a desktop drawing and a compact phone drawing, so nothing needs sideways scrolling */
+.chart-m{display:none}
+@media (max-width:640px){ .chart-scroll.fit .chart-d{display:none} .chart-scroll.fit .chart-m{display:block;min-width:0} .chart-scroll.fit::after{display:none} }
