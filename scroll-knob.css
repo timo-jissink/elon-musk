@@ -2,17 +2,17 @@
    and the soft glow pill for the current section — no knob on desktop.
    One visual language: neon-blue rim, soft outer glow, dark glass, frames that fade to the left.
    The tap list is the same icon rail unfolding, not a separate popup.
-   Production look is option A. ?bubble=b|c|d still selects the other mid-blue variants if present. */
+   Production look is option B. ?bubble=a|c|d still selects the other mid-blue variants if present. */
 .scroll-knob{display:none}
 
 @media (max-width:900px){
   .scroll-knob{
-    --sk-rim: 170, 220, 255;
-    --sk-core: 50, 150, 255;
-    --sk-deep: 20, 80, 200;
-    --sk-fill: .16;
-    --sk-rim-w: 1.5px;
-    --sk-bloom: 26px;
+    --sk-rim: 190, 230, 255;
+    --sk-core: 90, 175, 255;
+    --sk-deep: 50, 120, 230;
+    --sk-fill: .07;
+    --sk-rim-w: .85px;
+    --sk-bloom: 48px;
     display:block;position:fixed;top:0;right:0;bottom:0;z-index:40;
     width:4.2rem;pointer-events:none;
     padding-top:env(safe-area-inset-top,0px);

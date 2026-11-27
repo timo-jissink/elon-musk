@@ -59,6 +59,7 @@
     sources: opt(`<path d="M7 4h8a2 2 0 0 1 2 2v14l-6-2-6 2V6a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`, 1.16),
     credits: opt(`<rect x="4" y="6" width="16" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="11" r="1.6"/><path d="M4 16l4.5-3.5L13 16l3-2.5 4 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>`, 1.16),
     // Two-sided coin: one mark, two faces — for "One trait, two sides".
+    attention: opt(`<path d="M4 16V9l4 3 4-5 4 5 4-3v7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`, 1.16),
     traits: opt(`<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 4v16" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/><path d="M12 6.2c2.4 1.8 2.4 9.8 0 11.6" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round"/>`, 1.16)
   };
   // OpenAI + xAI share one section: both marks, side by side.
@@ -76,6 +77,8 @@
     'paypal': LOGOS.paypal,
     'free-speech-vs-cancel-culture': LOGOS.x,
     'summary': GENERIC.summary,
+    'attention': GENERIC.attention,
+    'where-he-falls-short': GENERIC.timelines,
     'contested-stories': GENERIC.contested,
     'his-public-style': GENERIC.style,
     'one-trait-two-sides': GENERIC.traits,
@@ -116,9 +119,9 @@
   const LIST_ONLY = new Set(['starlink-in-ukraine']);
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // Default look is option A. ?bubble=a|b|c|d is still honoured if present, otherwise ignored.
+  // Default look is option B. ?bubble=a|b|c|d is still honoured if present, otherwise ignored.
   const params = new URLSearchParams(location.search);
-  const bubbleOpt = /^[abcd]$/.test(params.get('bubble') || '') ? params.get('bubble') : 'a';
+  const bubbleOpt = /^[abcd]$/.test(params.get('bubble') || '') ? params.get('bubble') : 'b';
   const root = document.createElement('div');
   root.className = 'scroll-knob';
   root.dataset.bubble = bubbleOpt;
