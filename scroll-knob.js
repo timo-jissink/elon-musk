@@ -57,7 +57,10 @@
     human: opt(`<circle cx="9.3" cy="7.8" r="3.2"/><path d="M3.5 19.8c0-3.6 2.6-5.8 5.8-5.8s5.8 2.2 5.8 5.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M15.05 9.55c0-2.05 1.75-3.25 3.25-1.95 1.5-1.3 3.25-.15 3.25 1.95 0 2.35-3.25 4.55-3.25 4.55s-3.25-2.2-3.25-4.55z" fill="currentColor"/>`, 1.08),
     note: `<g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M8.6 14.2c-2.1 0-3.8-1.6-3.8-3.6 0-1.6 1.1-3 2.6-3.5.5-2.1 2.4-3.5 4.6-3.5 1.6 0 3 .7 3.9 1.9 1.2-.8 2.9-.6 3.9.7 1.1.4 1.9 1.6 1.9 2.9 0 1.8-1.4 3.3-3.1 3.5-.3 1.6-1.8 2.8-3.6 2.8-1.1 0-2.1-.5-2.8-1.2-.7.6-1.6.9-2.6.9z"/><circle cx="6.7" cy="16.8" r="1.5"/><circle cx="4.3" cy="20.15" r=".9"/></g>`,
     sources: opt(`<path d="M7 4h8a2 2 0 0 1 2 2v14l-6-2-6 2V6a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`, 1.16),
-    credits: opt(`<rect x="4" y="6" width="16" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="11" r="1.6"/><path d="M4 16l4.5-3.5L13 16l3-2.5 4 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>`, 1.16)
+    credits: opt(`<rect x="4" y="6" width="16" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="11" r="1.6"/><path d="M4 16l4.5-3.5L13 16l3-2.5 4 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>`, 1.16),
+    // Two-sided coin: one mark, two faces — for "One trait, two sides".
+    attention: opt(`<path d="M4 16V9l4 3 4-5 4 5 4-3v7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`, 1.16),
+    traits: opt(`<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 4v16" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/><path d="M12 6.2c2.4 1.8 2.4 9.8 0 11.6" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round"/>`, 1.16)
   };
   // OpenAI + xAI share one section: both marks, side by side.
   LOGOS.openai_xai = `<g transform="translate(0.05,5.2) scale(0.55)">${LOGOS.openai}</g><g transform="translate(13.15,5.2) scale(0.02553)">${LOGOS.xai}</g>`;
@@ -74,8 +77,11 @@
     'paypal': LOGOS.paypal,
     'free-speech-vs-cancel-culture': LOGOS.x,
     'summary': GENERIC.summary,
+    'attention': GENERIC.attention,
+    'where-he-falls-short': GENERIC.timelines,
     'contested-stories': GENERIC.contested,
     'his-public-style': GENERIC.style,
+    'one-trait-two-sides': GENERIC.traits,
     'timelines': GENERIC.timelines,
     'lawsuits': GENERIC.lawsuits,
     'timeline-of-criticism': GENERIC.criticism,
@@ -113,9 +119,9 @@
   const LIST_ONLY = new Set(['starlink-in-ukraine']);
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // Default look is option A. ?bubble=a|b|c|d is still honoured if present, otherwise ignored.
+  // Default look is option B. ?bubble=a|b|c|d is still honoured if present, otherwise ignored.
   const params = new URLSearchParams(location.search);
-  const bubbleOpt = /^[abcd]$/.test(params.get('bubble') || '') ? params.get('bubble') : 'a';
+  const bubbleOpt = /^[abcd]$/.test(params.get('bubble') || '') ? params.get('bubble') : 'b';
   const root = document.createElement('div');
   root.className = 'scroll-knob';
   root.dataset.bubble = bubbleOpt;

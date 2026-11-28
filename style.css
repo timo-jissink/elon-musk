@@ -402,3 +402,48 @@ table.calc-mini tr.calc-total th,table.calc-mini tr.calc-total td{font-weight:70
 .row-fold > p{margin:.5rem 0 0}
 .row-fold[open] > summary::after{content:none}
 .two-col > .callout:has(> .calc-fold:not([open])){align-self:start}
+
+/* Unfolded "One trait, two sides": both sides visible; a little wider than the
+   reading column so the two sides can sit next to each other on desktop. */
+#one-trait-two-sides > .rows{max-width:min(100%, 50rem)}
+#one-trait-two-sides .trait-pair{
+  display:grid;grid-template-columns:1fr 1fr;gap:.75rem 0;margin:.2rem 0 0;align-items:start;
+}
+#one-trait-two-sides .trait-pair > dd{margin:0;max-width:none;padding-right:1.15rem}
+#one-trait-two-sides .trait-pair > dd + dd{padding-right:0;padding-left:1.15rem;border-left:1px solid var(--line)}
+#one-trait-two-sides .trait-k{
+  display:block;font-size:.78rem;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 .3rem;
+}
+#one-trait-two-sides .spend{margin:1.8rem 0 1.2rem;max-width:var(--measure)}
+#one-trait-two-sides .spend h3{margin:0 0 .8rem;font-size:1.2rem}
+#one-trait-two-sides .spend p{margin:0 0 .85rem}
+#one-trait-two-sides .spend p:last-child{margin-bottom:0}
+@media (max-width:900px){
+  #one-trait-two-sides .trait-pair{grid-template-columns:1fr;gap:.7rem}
+  #one-trait-two-sides .trait-pair > dd{padding-right:0}
+  #one-trait-two-sides .trait-pair > dd + dd{padding-left:0;border-left:0;border-top:1px solid var(--line);padding-top:.7rem}
+}
+@media (min-width:1200px){
+  #one-trait-two-sides > .rows{max-width:min(100%, 50rem)}
+}
+
+/* attention chart: a desktop drawing and a compact phone drawing, so nothing needs sideways scrolling */
+.chart-m{display:none}
+@media (max-width:640px){ .chart-scroll.fit .chart-d{display:none} .chart-scroll.fit .chart-m{display:block;min-width:0} .chart-scroll.fit::after{display:none} }
+
+/* Short trait intro above the two-sided examples */
+#one-trait-two-sides .trait-intro{margin:0 0 .7rem;max-width:50rem}
+#the-human-side .spend-fold{margin:1.6rem 0 1.2rem;max-width:var(--measure)}
+#the-human-side .spend-fold .spend{margin:.8rem 0 0}
+#the-human-side .spend p{margin:0 0 .85rem}
+#the-human-side .spend p:last-child{margin-bottom:0}
+.voices{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin:1.1rem 0 1.2rem}
+.voices .callout{margin:0}
+@media (max-width:900px){ .voices{grid-template-columns:1fr} }
+.falls-prose h3,.falls-prose h4{margin-top:1.3rem}
+
+.keyfindings .kf-photo{margin:.2rem 0 1rem;max-width:16rem}
+.keyfindings .kf-photo figure{margin:0}
+.keyfindings .kf-photo img{width:100%;height:auto;border-radius:10px;display:block}
+.keyfindings .howto{margin:1rem 0 0;color:var(--muted)}
